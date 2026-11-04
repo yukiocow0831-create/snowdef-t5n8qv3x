@@ -8,6 +8,7 @@
 html,body{margin:0;height:100%;background:#1b2838;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif}
 #wrap{position:relative;width:100vw;height:100vh;height:100dvh;display:flex;justify-content:center;align-items:center}
 canvas{display:block;background:#e8f0f7;touch-action:none}
+#snd{position:absolute;top:8px;right:8px;z-index:5;font-size:30px;width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:#ff9800;color:#fff;box-shadow:0 3px 6px rgba(0,0,0,.4)}
 #ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgba(10,20,40,.78);color:#fff;text-align:center;padding:20px;box-sizing:border-box}
 #ov h1{font-size:40px;margin:0 0 8px;background:linear-gradient(90deg,#4fc3f7,#81c784,#ffd54f,#ff8a65);-webkit-background-clip:text;background-clip:text;color:transparent}
 #ov p{font-size:19px;line-height:1.6;margin:6px 0}
@@ -15,10 +16,12 @@ canvas{display:block;background:#e8f0f7;touch-action:none}
 .hide{display:none!important}
 </style></head><body>
 <div id="wrap"><canvas id="c"></canvas>
+<button id="snd" aria-label="音">🔊</button>
 <div id="ov"><h1>❄️ 雪原ディフェンス ❄️</h1>
 <p id="msg">赤い軍団から基地を守ろう！</p>
 <p style="font-size:17px">👆 画面をタッチして指でなぞると隊長が動きます<br>🔫 <b>武器</b>の床に乗る → 兵隊を追加・強化<br>⚔️ <b>突撃</b>の床に乗る → 10秒間 攻撃3倍<br>☢️ メーターが100%で <b>発射</b>ボタン → 全滅！</p>
 <p id="best"></p>
+<p style="font-size:15px;color:#ffe082">🔔 音が出ないときはマナーモードを解除してね</p>
 <button id="start">スタート</button></div></div>
 <script>
 (function(){
@@ -28,6 +31,32 @@ var scale=1;
 function resize(){var vw=window.innerWidth,vh=window.innerHeight;scale=Math.min(vw/W,vh/H);var dpr=window.devicePixelRatio||1;
 cv.style.width=(W*scale)+'px';cv.style.height=(H*scale)+'px';cv.width=W*scale*dpr;cv.height=H*scale*dpr;ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);}
 window.addEventListener('resize',resize);resize();
+
+// ===== sound =====
+var AC=null,master=null,muted=localStorage.getItem('snowdef_mute')==='1',lastShot=0,lastHit=0,bgmT=null,bgmStep=0;
+var sndBtn=document.getElementById('snd');function updBtn(){sndBtn.textContent=muted?'🔇':'🔊';sndBtn.style.background=muted?'#90a4ae':'#ff9800';}updBtn();
+function unlock(){try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();master=AC.createGain();master.connect(AC.destination);}
+ if(AC.state!=='running')AC.resume();var b=AC.createBuffer(1,1,22050),src=AC.createBufferSource();src.buffer=b;src.connect(AC.destination);src.start(0);
+ master.gain.value=muted?0:1;}catch(e){}}
+function tone(f,d,type,vol,f2,when){if(!AC||muted)return;var t=AC.currentTime+(when||0),o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+ g.gain.setValueAtTime(vol||.1,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02);}
+function noise(d,vol,fq,when){if(!AC||muted)return;var t=AC.currentTime+(when||0),n=Math.floor(AC.sampleRate*d),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(var i=0;i<n;i++)a[i]=Math.random()*2-1;
+ var s=AC.createBufferSource();s.buffer=b;var fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.value=fq||2000;var g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);s.connect(fl);fl.connect(g);g.connect(master);s.start(t);}
+var SFX={
+ shot:function(){var n=performance.now();if(n-lastShot<110)return;lastShot=n;noise(.05,.05,3500);},
+ hit:function(){var n=performance.now();if(n-lastHit<90)return;lastHit=n;tone(220,.05,'square',.03,120);},
+ kill:function(){noise(.25,.18,900);tone(160,.2,'sawtooth',.08,50);},
+ coin:function(){tone(988,.07,'square',.06);tone(1319,.15,'square',.06,0,.07);},
+ buy:function(){[523,659,784,1047].forEach(function(f,i){tone(f,.1,'square',.07,0,i*.07);});},
+ charge:function(){tone(200,.5,'sawtooth',.1,900);tone(400,.5,'square',.05,1800,.05);},
+ nuke:function(){noise(2.2,.6,500);tone(120,2,'sawtooth',.3,25);tone(60,2.2,'sine',.4,20);},
+ clear:function(){[523,659,784,1047,784,1047].forEach(function(f,i){tone(f,.15,'triangle',.12,0,i*.12);});},
+ over:function(){[392,330,262,196].forEach(function(f,i){tone(f,.35,'triangle',.14,0,i*.3);});}
+};
+var MEL=[523,0,659,0,784,659,523,0,587,0,698,0,880,698,587,0,659,0,784,0,988,784,659,0,784,698,659,587,523,0,0,0],BAS=[131,131,98,98,147,147,110,110];
+function bgmStart(){bgmStop();bgmStep=0;bgmT=setInterval(function(){if(!AC||muted||!G||!G.run)return;var m=MEL[bgmStep%32];if(m)tone(m,.13,'square',.025);if(bgmStep%4===0)tone(BAS[(bgmStep/4)%8],.25,'triangle',.06);bgmStep++;},150);}
+function bgmStop(){if(bgmT)clearInterval(bgmT);bgmT=null;}
+sndBtn.addEventListener('click',function(e){e.stopPropagation();muted=!muted;localStorage.setItem('snowdef_mute',muted?'1':'0');unlock();if(master)master.gain.value=muted?0:1;updBtn();if(!muted)SFX.coin();});
 var BKEY='snowdef_best';function best(){return +(localStorage.getItem(BKEY)||0);}
 var G;
 var pads={gun:{x:90,y:520,w:96,h:76},charge:{x:214,y:470,w:86,h:66},nuke:{x:200,y:640,r:46}};
@@ -51,25 +80,25 @@ function update(dt){
  if(vx||vy){p.tx=null;p.x+=vx*200*dt;p.y+=vy*200*dt;}else if(p.tx!==null){var dx=p.tx-p.x,dy=p.ty-p.y,d=Math.hypot(dx,dy);if(d>3){var st=Math.min(d,220*dt);p.x+=dx/d*st;p.y+=dy/d*st;}}
  p.x=Math.max(15,Math.min(W-15,p.x));p.y=Math.max(WALL+40,Math.min(H-15,p.y));
  // pads
- var g=pads.gun;if(G.padCD<=0&&inRect(p,g)){var c=gunCost();if(G.coins>=c){G.coins-=c;addSoldier();say('🔫 兵隊パワーアップ！');G.padCD=0.8;}else{G.padCD=0.5;}}
- var ch=pads.charge;if(G.padCD<=0&&inRect(p,ch)&&G.charge<=0){if(G.coins>=20){G.coins-=20;G.charge=10;say('⚔️ 突撃！攻撃3倍！');}G.padCD=1;}
+ var g=pads.gun;if(G.padCD<=0&&inRect(p,g)){var c=gunCost();if(G.coins>=c){G.coins-=c;addSoldier();SFX.buy();say('🔫 兵隊パワーアップ！');G.padCD=0.8;}else{G.padCD=0.5;}}
+ var ch=pads.charge;if(G.padCD<=0&&inRect(p,ch)&&G.charge<=0){if(G.coins>=20){G.coins-=20;G.charge=10;SFX.charge();say('⚔️ 突撃！攻撃3倍！');}G.padCD=1;}
  if(Math.hypot(p.x-pads.nuke.x,p.y-pads.nuke.y)<pads.nuke.r&&G.meter>=100)nuke();
  // squads
  for(var i=0;i<G.squads.length;i++){var s=G.squads[i];s.y+=s.sp*dt;if(s.y>=WALL-12){gameOver();return;}}
  // soldiers shoot
  G.soldiers.forEach(function(so){so.cd-=dt;if(so.cd<=0){var t=null,bd=1e9;G.squads.forEach(function(s){var d=Math.hypot(s.x-so.x,s.y-WALL);if(s.y>-10&&d<bd&&d<420){bd=d;t=s;}});
-  if(t){so.cd=0.45;var dmg=(4+so.lv*4)*(G.charge>0?3:1);var dx=t.x-so.x,dy=t.y-WALL,d=Math.hypot(dx,dy);G.bullets.push({x:so.x,y:WALL-6,vx:dx/d*600,vy:dy/d*600,t:t,dmg:dmg,life:1});}}});
+  if(t){so.cd=0.45;var dmg=(4+so.lv*4)*(G.charge>0?3:1);var dx=t.x-so.x,dy=t.y-WALL,d=Math.hypot(dx,dy);SFX.shot();G.bullets.push({x:so.x,y:WALL-6,vx:dx/d*600,vy:dy/d*600,t:t,dmg:dmg,life:1});}}});
  for(i=G.bullets.length-1;i>=0;i--){var b=G.bullets[i];b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;var s=b.t;
   if(G.squads.indexOf(s)>=0&&Math.abs(b.x-s.x)<sqW(s)/2&&Math.abs(b.y-s.y)<14){hit(s,b.dmg);G.bullets.splice(i,1);}else if(b.life<=0||b.y<-40)G.bullets.splice(i,1);}
  for(i=G.fx.length-1;i>=0;i--){G.fx[i].t-=dt;if(G.fx[i].t<=0)G.fx.splice(i,1);}
- if(!G.spawnQ.length&&!G.squads.length){var bonus=20+G.wave*5;G.coins+=bonus;G.score+=G.wave*100;say('🎉 ウェーブ '+G.wave+' クリア！ +'+bonus+'🪙');var w=G.wave;G.wave=w;G.spawnT=2.5;nextWave();G.msg='🎉 ウェーブ '+w+' クリア！ 次へ';}
+ if(!G.spawnQ.length&&!G.squads.length){var bonus=20+G.wave*5;G.coins+=bonus;G.score+=G.wave*100;say('🎉 ウェーブ '+G.wave+' クリア！ +'+bonus+'🪙');var w=G.wave;SFX.clear();G.spawnT=2.5;nextWave();G.msg='🎉 ウェーブ '+w+' クリア！ 次へ';}
 }
-function hit(s,dmg){var k=Math.min(dmg,s.hp);s.hp-=dmg;G.score+=k;G.meter=Math.min(100,G.meter+k*0.03);
+function hit(s,dmg){SFX.hit();var k=Math.min(dmg,s.hp);s.hp-=dmg;G.score+=k;G.meter=Math.min(100,G.meter+k*0.03);
  G.fx.push({x:s.x+(Math.random()-.5)*sqW(s),y:s.y,t:.25,c:'#ffb300'});
- if(s.hp<=0){G.squads.splice(G.squads.indexOf(s),1);G.coins+=Math.max(3,Math.round(s.max/40));G.kills++;G.fx.push({x:s.x,y:s.y,t:.6,c:'#ff5722',big:1});}}
-function nuke(){G.meter=0;G.flash=1.2;G.squads.slice().forEach(function(s){G.score+=s.hp;G.coins+=Math.max(3,Math.round(s.max/40));});G.squads=[];say('☢️ ドカーン！全滅！');}
+ if(s.hp<=0){G.squads.splice(G.squads.indexOf(s),1);G.coins+=Math.max(3,Math.round(s.max/40));G.kills++;SFX.kill();SFX.coin();G.fx.push({x:s.x,y:s.y,t:.6,c:'#ff5722',big:1});}}
+function nuke(){SFX.nuke();G.meter=0;G.flash=1.2;G.squads.slice().forEach(function(s){G.score+=s.hp;G.coins+=Math.max(3,Math.round(s.max/40));});G.squads=[];say('☢️ ドカーン！全滅！');}
 function inRect(p,r){return p.x>r.x&&p.x<r.x+r.w&&p.y>r.y&&p.y<r.y+r.h;}
-function gameOver(){G.run=false;G.over=true;var b=best();if(G.score>b)localStorage.setItem(BKEY,String(Math.floor(G.score)));
+function gameOver(){G.run=false;bgmStop();SFX.over();G.over=true;var b=best();if(G.score>b)localStorage.setItem(BKEY,String(Math.floor(G.score)));
  document.getElementById('msg').innerHTML='😢 基地が突破されました…<br>ウェーブ <b>'+G.wave+'</b>　スコア <b>'+Math.floor(G.score)+'</b>';
  document.getElementById('start').textContent='もう一度';showBest();ov.classList.remove('hide');}
 function showBest(){document.getElementById('best').textContent='🏆 ハイスコア：'+best();}
@@ -119,9 +148,9 @@ cv.addEventListener('touchstart',function(e){e.preventDefault();down=true;mv(e);
 cv.addEventListener('touchmove',function(e){e.preventDefault();if(down)mv(e);},{passive:false});
 cv.addEventListener('touchend',function(e){down=false;});
 cv.addEventListener('mousedown',function(e){down=true;mv(e);});cv.addEventListener('mousemove',function(e){if(down)mv(e);});window.addEventListener('mouseup',function(){down=false;});
-document.getElementById('start').addEventListener('click',function(){newGame();ov.classList.add('hide');});
+document.getElementById('start').addEventListener('click',function(){unlock();newGame();bgmStart();ov.classList.add('hide');});
 var last=0;function loop(t){var dt=Math.min(0.05,(t-last)/1000||0);last=t;if(G&&G.run)update(dt);if(G)draw();requestAnimationFrame(loop);}
 showBest();requestAnimationFrame(loop);
-window.__sd={get G(){return G},update:update,nuke:nuke};
+window.__sd={SFX:SFX,get AC(){return AC},get G(){return G},update:update,nuke:nuke};
 })();
 </script></body></html>
