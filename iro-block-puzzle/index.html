@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f4d7a2">
+<title>いろすべり</title>
+<style>
+:root{font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;color:#3a2a22;font-weight:700}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#f6e7c4;touch-action:none}
+button,input{font:inherit}button{border:0;cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.45}button:focus-visible,input:focus-visible{outline:4px solid #ef8a3a;outline-offset:3px}
+#app{height:100vh;height:100dvh;max-width:520px;margin:auto;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 12px max(10px,env(safe-area-inset-bottom));gap:8px}
+h1{font-size:40px;margin:8px 0 0;letter-spacing:1px;color:#d4532b}
+h1 small{display:block;font-size:18px;color:#8a5a32;margin-top:6px}
+.screen{display:flex;flex-direction:column;gap:8px;min-height:0;flex:1}
+.screen[hidden]{display:none}
+.lead{font-size:18px;line-height:1.55;margin:4px 0;background:#fff8ea;border-radius:16px;padding:12px 14px}
+.big{min-height:56px;border-radius:18px;background:#ef7a32;color:#fff;font-size:24px;box-shadow:0 4px 0 #c45518}
+.alt{min-height:52px;border-radius:16px;background:#fff;color:#8a4b22;font-size:20px;border:3px solid #f0c48a}
+.row{display:flex;gap:8px}.row>*{flex:1}
+#board{width:100%;flex:1;min-height:220px;background:#fff8ea;border-radius:22px;touch-action:none;display:block}
+.playHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.playHead b{font-size:22px}
+.tiny{min-height:48px;border-radius:14px;background:#fff;color:#6d4a2e;font-size:16px;border:2px solid #efd2a4}
+.gold{background:#ffe3a4}
+#levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;overflow:auto}
+.lv{min-height:74px;border-radius:16px;background:#fff;border:3px solid #f0d2a6;color:#5c3b28;font-size:16px}
+.lv.done{background:#e7f8df;border-color:#7dcb6a}
+.lv small{display:block;font-size:13px}
+#win{position:absolute;left:8px;right:8px;top:64px;background:#fffaf0;border:3px solid #f0b15a;border-radius:20px;padding:16px;text-align:center;box-shadow:0 10px 30px #0002;z-index:3}
+#win[hidden]{display:none}#win h2{margin:0 0 8px;font-size:32px;color:#d4532b}
+#fileHint{background:#ffe1b5;color:#6a3b10;border-radius:14px;padding:10px 12px;font-size:15px;line-height:1.45}
+#fileHint[hidden]{display:none}#fileHint b{display:block;margin-top:4px;font-size:13px;word-break:break-all}
+#audioMsg{min-height:0;font-size:14px;color:#7a5340;text-align:center}
+.vol{display:flex;align-items:center;gap:8px;background:#fff8ea;border-radius:14px;padding:6px 10px;font-size:16px}
+.vol input{flex:1;height:36px}
+#how p{font-size:18px;line-height:1.5;margin:0;background:#fff;border-radius:14px;padding:10px 12px}
+</style>
+</head>
+<body>
+<main id="app">
+<section id="titleScreen" class="screen">
+  <p id="fileHint" hidden>ファイルとして開いているため、iPhoneでは音が出ないことがあります。Safariで次のアドレスを開いてください。<b>https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/iro-block-puzzle/</b></p>
+  <h1>いろすべり<small>同じ色の出口へ、すべらせよう</small></h1>
+  <p class="lead">ブロックをなぞると、ぶつかるまでまっすぐ進みます。同じ色の出口に入ると消えます。</p>
+  <button id="start" class="big" type="button">スタート</button>
+  <button id="howBtn" class="alt" type="button">あそびかた</button>
+  <button id="selectBtn" class="alt" type="button">ステージをえらぶ</button>
+  <div class="vol"><span id="mute">🔊 音</span><input id="volume" type="range" min="0" max="100" step="5" aria-label="音量"></div>
+  <p id="audioMsg"></p>
+</section>
+<section id="howScreen" class="screen" hidden>
+  <h1>あそびかた</h1>
+  <div id="how">
+    <p>① 色のついたブロックを、指でなぞります。</p>
+    <p>② ぶつかるまで、まっすぐすべります。</p>
+    <p>③ 同じ色の出口に入ると、きれいに消えます。</p>
+    <p>④ 色のブロックを全部出したらクリアです。</p>
+    <p>こい灰色は動かないかべ。うすい石はすべりますが、出口はありません。</p>
+  </div>
+  <button id="howStart" class="big" type="button">ステージ1であそぶ</button>
+  <button id="howBack" class="alt" type="button">タイトルへ</button>
+</section>
+<section id="selectScreen" class="screen" hidden>
+  <h1>ステージ</h1>
+  <div id="levels"></div>
+  <button id="selectBack" class="alt" type="button">タイトルへ</button>
+</section>
+<section id="playScreen" class="screen" hidden style="position:relative">
+  <div class="playHead"><b id="lvName">1 まっすぐ</b><span id="leftCount">のこり 1</span></div>
+  <canvas id="board" width="600" height="600"></canvas>
+  <div class="row">
+    <button id="undo" class="tiny" type="button">ひとつ戻す</button>
+    <button id="retry" class="tiny" type="button">やりなおし</button>
+    <button id="hint" class="tiny gold" type="button">ヒント</button>
+  </div>
+  <div class="row">
+    <button id="playMute" class="tiny" type="button">🔊 音</button>
+    <button id="toSelect" class="tiny" type="button">ステージ</button>
+  </div>
+  <div id="win" hidden>
+    <h2 id="winTitle">クリア！</h2>
+    <p id="winText">うまくすべらせました。</p>
+    <button id="next" class="big" type="button">つぎのステージ</button>
+    <button id="winSelect" class="alt" type="button">ステージ一覧</button>
+  </div>
+</section>
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const canvas=$('board'),ctx=canvas.getContext('2d');if(!ctx.roundRect)ctx.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
+const store={get(k,d){try{const s=localStorage.getItem('iroSuberi.'+k);return s===null?d:JSON.parse(s)}catch{return d}},set(k,v){try{localStorage.setItem('iroSuberi.'+k,JSON.stringify(v));return true}catch{return false}}};
+let soundOn=store.get('sound',true)!==false,volume=Number(store.get('volume',70));if(!Number.isFinite(volume))volume=70;volume=Math.max(0,Math.min(100,volume));
+let cleared=store.get('cleared',[]);if(!Array.isArray(cleared))cleared=[];
+/*RULES*/
+const DIRS=[[0,-1],[1,0],[0,1],[-1,0]];
+function cloneBlocks(blocks){return blocks.map(b=>({...b,cells:b.cells.map(c=>[c[0],c[1]])}))}
+function occMap(blocks){const m=new Map();for(const b of blocks){if(b.out)continue;for(const [x,y] of b.cells)m.set(x+','+y,b.id)}return m}
+function slide(blocks,gates,w,h,id,dir){const nextBlocks=cloneBlocks(blocks);const b=nextBlocks.find(x=>x.id===id);if(!b||b.out||b.fixed)return null;const [dx,dy]=DIRS[dir];let moved=false;for(;;){const occ=occMap(nextBlocks);let boardHit=false,offGate=false,offWall=false;const next=b.cells.map(([x,y])=>[x+dx,y+dy]);for(let i=0;i<next.length;i++){const [nx,ny]=next[i],[x,y]=b.cells[i];if(nx<0||ny<0||nx>=w||ny>=h){if(gates.some(g=>g.x===x&&g.y===y&&g.d===dir&&g.c===b.color))offGate=true;else offWall=true}else if(occ.get(nx+','+ny)&&occ.get(nx+','+ny)!==b.id)boardHit=true}if(boardHit)break;if(offGate){b.exitFrom=b.cells.map(c=>[c[0],c[1]]);b.out=true;b.cells=[];moved=true;break}if(offWall)break;b.cells=next;moved=true}if(!moved)return null;return nextBlocks}
+function won(blocks){return blocks.every(b=>b.fixed||b.color==='stone'||b.out)}
+function stateKey(blocks){return blocks.filter(b=>!b.fixed).map(b=>b.id+':'+(b.out?'-':b.cells.map(c=>c[0]+','+c[1]).sort().join(';'))).sort().join('|')}
+/*RULES_END*/
+const LEVELS=[
+{id:1,name:'まっすぐ',w:5,h:4,gates:[{x:4,y:1,d:1,c:'red'}],blocks:[{id:'r',color:'red',cells:[[0,1],[1,1]]}]},
+{id:2,name:'したへ',w:5,h:5,gates:[{x:2,y:4,d:2,c:'blue'}],blocks:[{id:'b',color:'blue',cells:[[2,0],[2,1]]},{id:'w1',color:'wall',fixed:true,cells:[[0,2],[1,2],[3,2],[4,2]]}]},
+{id:3,name:'ふたつ',w:5,h:4,gates:[{x:0,y:1,d:3,c:'red'},{x:4,y:2,d:1,c:'green'}],blocks:[{id:'r',color:'red',cells:[[1,1],[2,1]]},{id:'g',color:'green',cells:[[2,2],[3,2]]}]},
+{id:4,name:'どかして',w:5,h:5,gates:[{x:4,y:2,d:1,c:'red'},{x:2,y:0,d:0,c:'yellow'}],blocks:[{id:'r',color:'red',cells:[[0,2],[1,2]]},{id:'y',color:'yellow',cells:[[2,2],[3,2]]}]},
+{id:5,name:'かど',w:5,h:5,gates:[{x:4,y:0,d:1,c:'red'}],blocks:[{id:'r',color:'red',cells:[[0,2],[0,3]]},{id:'w',color:'wall',fixed:true,cells:[[1,2],[2,2],[3,2]]}]},
+{id:6,name:'Lのじ',w:5,h:5,gates:[{x:4,y:2,d:1,c:'orange'},{x:3,y:0,d:0,c:'blue'}],blocks:[{id:'o',color:'orange',cells:[[0,2],[1,2],[1,1]]},{id:'b',color:'blue',cells:[[3,2],[3,3]]},{id:'w',color:'wall',fixed:true,cells:[[2,3],[4,4],[0,4]]}]},
+{id:7,name:'いしころ',w:5,h:5,gates:[{x:4,y:2,d:1,c:'green'}],blocks:[{id:'g',color:'green',cells:[[0,2],[1,2]]},{id:'s',color:'stone',cells:[[2,2]]},{id:'w',color:'wall',fixed:true,cells:[[2,3],[3,3],[4,3]]}]},
+{id:8,name:'みっつ',w:6,h:5,gates:[{x:0,y:0,d:0,c:'red'},{x:5,y:2,d:1,c:'blue'},{x:2,y:4,d:2,c:'yellow'}],blocks:[{id:'r',color:'red',cells:[[0,2],[0,3]]},{id:'b',color:'blue',cells:[[2,2],[3,2]]},{id:'y',color:'yellow',cells:[[2,1],[2,0]]},{id:'w',color:'wall',fixed:true,cells:[[1,1],[1,2],[4,0],[4,1]]}]},
+{id:9,name:'せまい',w:6,h:6,gates:[{x:5,y:2,d:1,c:'yellow'},{x:1,y:5,d:2,c:'red'},{x:0,y:0,d:0,c:'blue'}],blocks:[{id:'y',color:'yellow',cells:[[0,2],[1,2]]},{id:'s',color:'stone',cells:[[3,2]]},{id:'r',color:'red',cells:[[1,3],[1,4]]},{id:'b',color:'blue',cells:[[4,0],[5,0]]},{id:'w',color:'wall',fixed:true,cells:[[3,3],[4,3],[2,1],[0,1],[5,3],[2,4]]}]},
+{id:10,name:'だいすき',w:6,h:6,gates:[{x:5,y:2,d:1,c:'orange'},{x:0,y:4,d:3,c:'pink'},{x:4,y:0,d:0,c:'green'},{x:1,y:5,d:2,c:'blue'}],blocks:[{id:'o',color:'orange',cells:[[1,2],[2,2],[2,3]]},{id:'p',color:'pink',cells:[[3,4],[4,4]]},{id:'g',color:'green',cells:[[4,2],[4,3]]},{id:'b',color:'blue',cells:[[1,3],[1,4]]},{id:'s',color:'stone',cells:[[3,2]]},{id:'w',color:'wall',fixed:true,cells:[[0,2],[3,0],[3,1],[5,4],[5,5],[0,5]]}]},
+{id:11,name:'にぎやか',w:6,h:6,gates:[{x:5,y:0,d:1,c:'red'},{x:0,y:5,d:3,c:'blue'},{x:3,y:0,d:0,c:'green'}],blocks:[{id:'r',color:'red',cells:[[1,2],[2,2]]},{id:'b',color:'blue',cells:[[2,3],[2,4]]},{id:'g',color:'green',cells:[[3,2],[4,2],[4,3]]},{id:'s',color:'stone',cells:[[3,4]]},{id:'w',color:'wall',fixed:true,cells:[[0,2],[5,2],[5,4],[1,0],[1,1]]}]},
+{id:12,name:'まわり',w:6,h:6,gates:[{x:5,y:4,d:1,c:'pink'},{x:0,y:0,d:0,c:'orange'}],blocks:[{id:'p',color:'pink',cells:[[0,1],[1,1],[2,1]]},{id:'o',color:'orange',cells:[[0,2],[0,3]]},{id:'w',color:'wall',fixed:true,cells:[[3,1],[4,1],[5,1],[3,2],[3,3]]}]}
+];
+/*LEVELS_END*/
+const PAINT={red:'#ef5b4c',blue:'#3c8dff',yellow:'#f0c43a',green:'#37c074',orange:'#f0892a',pink:'#f06aa8',stone:'#d7d1c6',wall:'#6d645c'};
+const RATE=22050;
+function dataWav(samples){const n=samples.length,u8=new Uint8Array(44+n*2),v=new DataView(u8.buffer),ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};ws(0,'RIFF');v.setUint32(4,36+n*2,true);ws(8,'WAVE');ws(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,RATE,true);v.setUint32(28,RATE*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,n*2,true);for(let i=0;i<n;i++)v.setInt16(44+i*2,Math.max(-32767,Math.min(32767,samples[i]*32767)),true);let bin='';for(let i=0;i<u8.length;i+=8192)bin+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return 'data:audio/wav;base64,'+btoa(bin)}
+function toneSamples(freq,dur,amp,wave){const n=Math.max(1,Math.floor(RATE*dur)),a=new Float32Array(n);for(let i=0;i<n;i++){const t=i/RATE,env=Math.min(1,i/60)*Math.min(1,(n-i)/140);let s=Math.sin(2*Math.PI*freq*t);if(wave==='saw')s=2*((freq*t)%1)-1;a[i]=s*amp*env}return a}
+function mixAt(dest,src,at){for(let i=0;i<src.length&&at+i<dest.length;i++){let s=dest[at+i]+src[i];if(s>1)s=1;if(s<-1)s=-1;dest[at+i]=s}}
+function song(){const step=Math.floor(RATE*.22),notes=[64,67,69,0,67,64,62,0],a=new Float32Array(step*notes.length);notes.forEach((m,i)=>{if(!m)return;mixAt(a,toneSamples(440*2**((m-69)/12),.16,.4),i*step);if(i%4===0)mixAt(a,toneSamples(440*2**(([48,53,45,55][i/4%4]-69)/12),.3,.22),i*step)});return a}
+function engineLoop(){const period=RATE/75,n=period*4,a=new Float32Array(n);for(let i=0;i<n;i++){const p=(i%period)/period;a[i]=(2*p-1)*.22+Math.sin(2*Math.PI*i/period)*.18}return a}
+class Sounds{
+ constructor(){this.ready=false;this.started=false;this.sessionSet=false;this.nodes=[];this.shots={};this.last={}}
+ prepare(){if(this.ready)return;const mk=src=>{const a=new Audio();a.preload='auto';a.setAttribute('playsinline','');a.src=src;a.volume=0;return a};this.bgm=mk(dataWav(song()));this.bgm.loop=true;this.engine=mk(dataWav(engineLoop()));this.engine.loop=true;const one=(spec)=>{const len=spec.reduce((s,n)=>s+n[1],0),buf=new Float32Array(Math.floor(RATE*len)+80);let at=0;for(const [f,d,amp] of spec){mixAt(buf,toneSamples(f,d,amp),Math.floor(at));at+=d*RATE*.8}return mk(dataWav(buf))};this.shots.slide=one([[520,.05,.3],[280,.08,.35]]);this.shots.exit=one([[660,.08,.4],[880,.1,.45],[1180,.14,.4]]);this.shots.clear=one([[523,.1,.4],[659,.1,.42],[784,.1,.45],[1047,.18,.5]]);this.nodes=[this.bgm,this.engine,...Object.values(this.shots)];this.ready=true}
+ arm(){try{this.prepare();if(!soundOn||!(volume>0)){this.apply();return}if(!this.sessionSet){try{const s=navigator.audioSession;if(s&&'type' in s){s.type='playback';if(s.type==='playback')this.sessionSet=true}}catch{}this.sessionSet=true}this.apply();const first=!this.started;for(const node of this.nodes){if(!(node.loop||first))continue;if(!node.loop&&node.volume<=0)node.volume=.05;const p=node.play();if(!node.loop)node.volume=0;if(p&&p.catch)p.catch(()=>{})}this.started=true;this.apply()}catch{}}
+ gain(){return !soundOn||!(volume>0)?0:volume/100}
+ apply(){if(!this.ready)return;const g=this.gain(),on=screen==='play'&&phase==='play'&&!winOpen;try{this.bgm.volume=g*(on?.42:.22);this.engine.volume=on?g*.4:0;if(on)this.engine.playbackRate=Math.max(.7,Math.min(1.6,.8))}catch{}}
+ fx(name){const el=this.shots[name];if(!el||!this.started||!soundOn||!(volume>0))return;const now=performance.now();if(now-(this.last[name]||0)<90)return;this.last[name]=now;try{el.volume=Math.min(1,this.gain());el.currentTime=0;const p=el.play();if(p&&p.catch)p.catch(()=>{})}catch{}}
+}
+const audio=new Sounds();
+function paintMute(){const t=soundOn?'🔊 音オン':'🔇 音オフ';$('mute').textContent=t;$('playMute').textContent=t}
+function toggleMute(){soundOn=!soundOn;store.set('sound',soundOn);if(soundOn)audio.arm();else audio.apply();paintMute()}
+$('volume').value=volume;$('volume').oninput=e=>{volume=Math.max(0,Math.min(100,Number(e.target.value)||0));store.set('volume',volume);if(soundOn&&volume>0)audio.arm();else audio.apply()};
+$('mute').onclick=toggleMute;$('playMute').onclick=toggleMute;
+addEventListener('pointerup',()=>{if(soundOn)audio.arm()},true);
+addEventListener('touchend',()=>{if(soundOn)audio.arm()},true);
+addEventListener('click',()=>{if(soundOn)audio.arm()},true);
+let screen='title',level=LEVELS[0],blocks=[],history=[],anim=null,hint=null,particles=[],drag=null,winOpen=false,phase='play';
+function show(name){screen=name;for(const id of ['titleScreen','howScreen','selectScreen','playScreen'])$(id).hidden=id!==name+'Screen';if(name==='title'||name==='how'||name==='select')audio.apply();if(name==='select')drawLevels()}
+function drawLevels(){$('levels').replaceChildren();LEVELS.forEach((lv,i)=>{const b=document.createElement('button');b.className='lv'+(cleared.includes(lv.id)?' done':'');b.type='button';b.innerHTML=(cleared.includes(lv.id)?'★ ':'')+lv.id+'<small>'+lv.name+'</small>';b.onclick=()=>openLevel(i);$('levels').append(b)})}
+function openLevel(i){level=LEVELS[i];blocks=cloneBlocks(level.blocks);history=[];anim=null;hint=null;particles=[];winOpen=false;$('win').hidden=true;phase='play';$('lvName').textContent=level.id+' '+level.name;show('play');audio.arm();updateLeft();resize()}
+function updateLeft(){const n=blocks.filter(b=>!b.fixed&&b.color!=='stone'&&!b.out).length;$('leftCount').textContent='のこり '+n}
+function snapshot(){return JSON.parse(JSON.stringify(blocks))}
+function doMove(id,dir){if(anim||winOpen)return;const before=blocks.find(b=>b.id===id);if(!before||before.fixed||before.out)return;const from=before.cells.map(c=>[c[0],c[1]]);const next=slide(blocks,level.gates,level.w,level.h,id,dir);if(!next)return;history.push(snapshot());const after=next.find(b=>b.id===id);blocks=next;audio.fx(after.out?'exit':'slide');const to=after.out?after.exitFrom.map(([x,y])=>[x+DIRS[dir][0],y+DIRS[dir][1]]):after.cells.map(c=>[c[0],c[1]]);anim={id,from,to,exit:after.out,color:before.color,t0:performance.now(),dur:after.out?420:260}}
+function finishAnim(){if(anim&&anim.exit){for(const [x,y] of anim.to)burst(x,y,anim.color)}anim=null;updateLeft();if(won(blocks)&&!winOpen){winOpen=true;audio.fx('clear');if(!cleared.includes(level.id)){cleared.push(level.id);store.set('cleared',cleared)}$('winTitle').textContent=level.id===LEVELS.length?'ぜんぶクリア！':'クリア！';$('winText').textContent=level.name+' ができました。';$('next').hidden=level.id===LEVELS.length;$('win').hidden=false;audio.apply()}}
+function burst(x,y,color){for(let i=0;i<10;i++)particles.push({x,y,vx:(Math.random()-.5)*4,vy:(Math.random()-.8)*4,life:1,color:PAINT[color]||'#fff'})}
+function hintMove(){const start=cloneBlocks(blocks);const q=[start];const prev=new Map();const seen=new Set([stateKey(start)]);let guard=0;while(q.length&&guard<80000){const cur=q.shift();guard++;if(won(cur)){let k=stateKey(cur),first=null;while(prev.has(k)){const p=prev.get(k);first=p.move;k=p.from}return first}for(const b of cur){if(b.fixed||b.out)continue;for(let d=0;d<4;d++){const n=slide(cur,level.gates,level.w,level.h,b.id,d);if(!n)continue;const k=stateKey(n);if(seen.has(k))continue;seen.add(k);prev.set(k,{from:stateKey(cur),move:[b.id,d]});q.push(n)}}}return null}
+function geom(){const r=canvas.getBoundingClientRect();const cols=level.w+2,rows=level.h+2;const size=Math.min(r.width/cols,r.height/rows);const ox=(r.width-size*cols)/2+size,oy=(r.height-size*rows)/2+size;return {size,ox,oy,rect:r}}
+function cellAt(e){const g=geom(),x=e.clientX-g.rect.left,y=e.clientY-g.rect.top;return [Math.floor((x-g.ox)/g.size),Math.floor((y-g.oy)/g.size)]}
+function blockAt(x,y){return blocks.find(b=>!b.out&&b.cells.some(c=>c[0]===x&&c[1]===y))}
+canvas.addEventListener('pointerdown',e=>{if(screen!=='play'||winOpen)return;e.preventDefault();const [x,y]=cellAt(e);const b=blockAt(x,y);if(!b||b.fixed||anim)return;drag={id:b.id,x:e.clientX,y:e.clientY,done:false};canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag||drag.done)return;e.preventDefault();const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)<18)return;drag.done=true;const dir=Math.abs(dx)>Math.abs(dy)?(dx>0?1:3):(dy>0?2:0);doMove(drag.id,dir)});
+canvas.addEventListener('pointerup',()=>{drag=null});
+canvas.addEventListener('pointercancel',()=>{drag=null});
+function round(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function drawCell(px,py,size,color){const p=size*.08;round(px+p,py+p,size-p*2,size-p*2,size*.18);ctx.fillStyle=PAINT[color]||'#ccc';ctx.fill();ctx.fillStyle='#ffffff55';const s=size*.16;for(const [a,b] of [[.28,.28],[.72,.28],[.28,.72],[.72,.72]]){ctx.beginPath();ctx.arc(px+size*a,py+size*b,s*.55,0,Math.PI*2);ctx.fill()}}
+function draw(){const g=geom();const dpr=Math.min(devicePixelRatio||1,2);if(canvas.width!==Math.round(g.rect.width*dpr)||canvas.height!==Math.round(g.rect.height*dpr)){canvas.width=Math.round(g.rect.width*dpr);canvas.height=Math.round(g.rect.height*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,g.rect.width,g.rect.height);round(g.ox-g.size*.35,g.oy-g.size*.35,g.size*(level.w+0.7),g.size*(level.h+0.7),18);ctx.fillStyle='#8d6a45';ctx.fill();round(g.ox-4,g.oy-4,g.size*level.w+8,g.size*level.h+8,12);ctx.fillStyle='#f3e2c4';ctx.fill();for(let y=0;y<level.h;y++)for(let x=0;x<level.w;x++){ctx.fillStyle=(x+y)%2?'#f7e7cc':'#f1dcb8';ctx.fillRect(g.ox+x*g.size+1,g.oy+y*g.size+1,g.size-2,g.size-2)}for(const gate of level.gates){const px=g.ox+gate.x*g.size,py=g.oy+gate.y*g.size,s=g.size;ctx.fillStyle=PAINT[gate.c];ctx.beginPath();if(gate.d===0)ctx.roundRect(px+s*.2,py-s*.55,s*.6,s*.5,6);if(gate.d===1)ctx.roundRect(px+s*.85,py+s*.2,s*.55,s*.6,6);if(gate.d===2)ctx.roundRect(px+s*.2,py+s*.85,s*.6,s*.55,6);if(gate.d===3)ctx.roundRect(px-s*.4,py+s*.2,s*.5,s*.6,6);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold '+Math.floor(s*.4)+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';const ax=gate.d===1?px+s*1.12:gate.d===3?px-s*.15:px+s*.5;const ay=gate.d===0?py-s*.3:gate.d===2?py+s*1.12:py+s*.5;ctx.fillText(['↑','→','↓','←'][gate.d],ax,ay)}const prog=anim?Math.min(1,(performance.now()-anim.t0)/anim.dur):1;for(const b of blocks){if(b.out&&(!anim||anim.id!==b.id))continue;const cells=anim&&anim.id===b.id?anim.from.map((c,i)=>{const t=anim.to[i]||c;return [c[0]+(t[0]-c[0])*prog,c[1]+(t[1]-c[1])*prog]}):b.cells;for(const [x,y] of cells)drawCell(g.ox+x*g.size,g.oy+y*g.size,g.size,b.color)}if(hint&&performance.now()<hint.until){const b=blocks.find(x=>x.id===hint.id&&!x.out);if(b){const [x,y]=b.cells[0];ctx.fillStyle='#ffffffcc';ctx.font='bold '+Math.floor(g.size*.7)+'px sans-serif';ctx.textAlign='center';ctx.fillText(['↑','→','↓','←'][hint.dir],g.ox+(x+.5)*g.size,g.oy+(y+.5)*g.size)}}particles=particles.filter(p=>p.life>0);for(const p of particles){p.x+=p.vx*.08;p.y+=p.vy*.08;p.life-=.02;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(g.ox+(p.x+.2)*g.size,g.oy+(p.y+.2)*g.size,g.size*.25,g.size*.25);ctx.globalAlpha=1}if(anim&&prog>=1)finishAnim()}
+function frame(){draw();if(screen==='play')audio.apply();requestAnimationFrame(frame)}
+$('start').onclick=()=>{audio.arm();const next=LEVELS.findIndex(l=>!cleared.includes(l.id));openLevel(next<0?0:next)};
+$('howBtn').onclick=()=>show('how');$('howBack').onclick=()=>show('title');$('howStart').onclick=()=>{audio.arm();openLevel(0)};
+$('selectBtn').onclick=()=>show('select');$('selectBack').onclick=()=>show('title');$('toSelect').onclick=()=>show('select');$('winSelect').onclick=()=>{winOpen=false;show('select')};
+$('undo').onclick=()=>{if(!history.length||anim)return;blocks=history.pop();hint=null;winOpen=false;$('win').hidden=true;updateLeft();audio.apply()};
+$('retry').onclick=()=>openLevel(LEVELS.findIndex(l=>l.id===level.id));
+$('hint').onclick=()=>{if(anim||winOpen)return;const move=hintMove();if(!move){$('leftCount').textContent='ヒントなし';return}hint={id:move[0],dir:move[1],until:performance.now()+2200};$('leftCount').textContent='矢印のほうへ'};
+$('next').onclick=()=>{const i=LEVELS.findIndex(l=>l.id===level.id);openLevel(Math.min(LEVELS.length-1,i+1))};
+if(!(location.protocol==='http:'||location.protocol==='https:'))$('fileHint').hidden=false;
+paintMute();resize();addEventListener('resize',()=>{});function resize(){}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
