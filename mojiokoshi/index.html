@@ -15,6 +15,7 @@
 <style>
 :root{font-family:"Hiragino Sans","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#1c2430;font-size:18px;line-height:1.5}
 *{box-sizing:border-box}
+[hidden]{display:none!important;pointer-events:none!important}
 html,body{margin:0;min-height:100%;background:#f3efe6}
 body{padding:max(12px,env(safe-area-inset-top)) 12px 28px}
 button,input,textarea{font:inherit;color:inherit}
@@ -204,7 +205,8 @@ const MINUTES=`要点
 ・
 `;
 const PROMPT='以下の会議の文字起こしを議事録にまとめてください。見出しは「要点」「決定事項」「対応事項（担当・期限）」「保留事項」。担当者や期限が発言に出てこない場合は「未定」とし、わからない内容は推測で埋めないでください。';
-const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let isiOS=false;
+try{const ua=navigator.userAgent||'';const plat=navigator.platform||'';const touches=navigator.maxTouchPoints||0;isiOS=/iPad|iPhone|iPod/.test(ua)||(plat==='MacIntel'&&touches>1)}catch(e){isiOS=false}
 let dbp,recording=false,wantListen=false,busy=false,session='',startedPerf=0,elapsedMs=0;
 let lines=[],interim='',mime='',micStream=null,recorder=null,rec=null,chunkN=0,memChunks=[];
 let mode='listen',restartFails=0,fakeMeterOn=false,lastError='',skipEndRestart=false,sawStart=false;
@@ -218,7 +220,7 @@ function durLabel(ms){const s=Math.round(ms/1000);if(s<60)return s+'秒';const m
 function titleNow(){const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())}
 function linesToText(list){return list.map(l=>'['+stamp(l.sec)+'] '+l.text).join('\n')}
 function safeName(title){return (title||'もじメモ').replace(/[\\/:*?"<>|]/g,' ').trim().slice(0,40)||'もじメモ'}
-function status(msg){$('status').textContent=msg}
+function status(msg){const el=$('status');if(el)el.textContent=msg}
 function openDb(){if(dbp)return dbp;dbp=new Promise((resolve,reject)=>{const req=indexedDB.open('mojiMemo',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('meetings'))db.createObjectStore('meetings',{keyPath:'id'});if(!db.objectStoreNames.contains('recovery'))db.createObjectStore('recovery',{keyPath:'id'});if(!db.objectStoreNames.contains('chunks'))db.createObjectStore('chunks',{keyPath:'id'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});return dbp}
 function txDone(tx){return new Promise((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('aborted'))})}
 async function idbPut(store,value){const db=await openDb();const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(value);await txDone(tx)}
@@ -226,7 +228,6 @@ async function idbGet(store,id){const db=await openDb();return new Promise((reso
 async function idbAll(store){const db=await openDb();return new Promise((resolve,reject)=>{const rq=db.transaction(store,'readonly').objectStore(store).getAll();rq.onsuccess=()=>resolve(rq.result||[]);rq.onerror=()=>reject(rq.error)})}
 async function idbDel(store,id){const db=await openDb();const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(id);await txDone(tx)}
 function pickMime(){const list=isiOS?['audio/mp4','audio/aac','audio/webm']:['audio/webm;codecs=opus','audio/webm','audio/mp4'];if(typeof MediaRecorder==='undefined')return '';return list.find(t=>MediaRecorder.isTypeSupported(t))||''}
-function ensureCtx(){if(!audioCtx)audioCtx=new AudioContext();if(audioCtx.state==='suspended')return audioCtx.resume();return Promise.resolve()}
 function playChime(){if(muted||!audioCtx)return;const t=audioCtx.currentTime;const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(660,t);o.frequency.exponentialRampToValueAtTime(880,t+.09);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.07,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.28);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.3)}
 function paintMute(){$('mute').textContent=muted?'音オフ':'音オン';$('mute').setAttribute('aria-pressed',muted?'true':'false')}
 async function lockWake(){try{if(navigator.wakeLock)wakeLock=await navigator.wakeLock.request('screen')}catch{}}
@@ -238,7 +239,7 @@ function setHear(on){$('hear').hidden=!on;$('hear').classList.toggle('on',!!on)}
 function showResume(){$('resumeListen').hidden=false}
 function hideResume(){$('resumeListen').hidden=true}
 function showErr(code){lastError=code||'unknown';$('errCode').textContent='エラーコード: '+lastError}
-function startFakeMeter(){if(fakeMeterOn)return;fakeMeterOn=true;const loop=()=>{if(!fakeMeterOn)return;const pct=30+Math.round(24*Math.abs(Math.sin(performance.now()/180)));$('meterBar').style.width=pct+'%';requestAnimationFrame(loop)};requestAnimationFrame(loop)}
+function startFakeMeter(){if(fakeMeterOn)return;fakeMeterOn=true;let last=-1;const loop=()=>{if(!fakeMeterOn)return;const pct=30+Math.round(24*Math.abs(Math.sin(performance.now()/180)));if(pct!==last){last=pct;const bar=$('meterBar');if(bar)bar.style.width=pct+'%'}requestAnimationFrame(loop)};requestAnimationFrame(loop)}
 function stopFakeMeter(){fakeMeterOn=false;if(!analyser)$('meterBar').style.width='0%'}
 function wireRec(r){
   r.onstart=()=>{sawStart=true;restartFails=0;hideResume();setHear(true);status('聞き取り中…')};
@@ -263,19 +264,20 @@ async function discardRecovery(){const recov=await idbGet('recovery','open');if(
 function fileExt(m){if(!m)return 'audio';if(m.includes('mp4')||m.includes('aac')||m.includes('m4a'))return 'm4a';if(m.includes('webm'))return 'webm';return 'audio'}
 async function shareOrDownload(blob,filename,title){const file=new File([blob],filename,{type:blob.type||'application/octet-stream'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title});return}catch(e){if(e&&e.name==='AbortError')return}}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 function downloadText(text,filename,type){shareOrDownload(new Blob([text],{type}),filename,'もじメモ')}
-async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch{}const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch{}ta.remove();return ok}
-function refreshTimer(){elapsedMs=performance.now()-startedPerf;$('timer').textContent=clock(elapsedMs)}
+async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){const wrote=await Promise.race([navigator.clipboard.writeText(text).then(()=>true).catch(()=>false),new Promise(resolve=>setTimeout(()=>resolve(false),400))]);if(wrote)return true}}catch(e){}const ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.left='0';ta.style.top='0';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();return ok}
+function refreshTimer(){elapsedMs=performance.now()-startedPerf;const next=clock(elapsedMs);const el=$('timer');if(el&&el.textContent!==next)el.textContent=next}
 function captureWanted(){if(mode==='audio')return true;if(isiOS)return false;return !!SR}
 async function startCapture(){let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){if(mode==='listen'){$('bothNote').hidden=false;status('文字起こしを続けます。音声ファイルは残りません。');startFakeMeter();return}status(micHelp(e));return}micStream=stream;startMeter(stream);if(mode==='audio'||typeof MediaRecorder==='undefined'){if(typeof MediaRecorder==='undefined'&&mode==='audio'){status('このブラウザでは録音ファイルを作れません。');return}}if(typeof MediaRecorder==='undefined'){preferListen();return}try{recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);mime=recorder.mimeType||mime;recorder.ondataavailable=ev=>{addChunk(ev.data).catch(()=>{})};recorder.onerror=()=>{if(mode==='listen')preferListen()};try{recorder.start(20000)}catch{recorder.start()}}catch{if(mode==='listen')preferListen();else status('録音を開始できませんでした。')}}
 function beginSessionSync(){if(!$('recover').hidden){status('先に「復旧」か「捨てる」を選んでください。');return false}recording=true;wantListen=mode==='listen'&&!!SR;startedPerf=performance.now();elapsedMs=0;session=uid();lines=[];interim='';chunkN=0;memChunks=[];restartFails=0;sawStart=false;mime=pickMime();const title=titleNow();$('timer').dataset.title=title;$('rec').classList.add('on');$('rec').setAttribute('aria-pressed','true');$('rec').textContent='停止';hideResume();$('bothNote').hidden=true;renderLive();if(mode==='listen'&&SR){try{armRecognitionSync()}catch(e){showErr((e&&e.name)||'start-failed');status('文字起こしを開始できませんでした。下のボタンでもう一度。');showResume()}}else if(!SR){$('speechNote').hidden=false;status('録音しています。')}else status('録音しています。');tick();return true}
-async function finishStart(){busy=true;try{await ensureCtx();playChime();await lockWake();if(captureWanted())await startCapture();else startFakeMeter();await persistRecovery();saveTimer=setInterval(()=>{refreshTimer();persistRecovery().catch(()=>{})},5000)}catch(e){status(micHelp(e))}finally{busy=false}}
+async function finishStart(){busy=true;try{try{await ensureCtx();playChime()}catch(e){}lockWake();try{if(captureWanted())await startCapture();else startFakeMeter()}catch(e){status(micHelp(e))}try{await persistRecovery();saveTimer=setInterval(()=>{refreshTimer();persistRecovery().catch(()=>{})},5000)}catch(e){}}finally{busy=false}}
 function tick(){if(!recording)return;refreshTimer();requestAnimationFrame(tick)}
 async function stopRecorderCollect(){if(!recorder)return chunksOf(session);const recRef=recorder;await new Promise(resolve=>{recRef.onstop=()=>resolve();try{if(recRef.state==='recording')recRef.requestData()}catch{}try{if(recRef.state!=='inactive')recRef.stop();else resolve()}catch{resolve()}});recorder=null;return chunksOf(session)}
 async function stopAll(){recording=false;wantListen=false;setHear(false);hideResume();stopFakeMeter();clearInterval(saveTimer);saveTimer=0;try{if(rec)rec.stop()}catch{}rec=null;const sid=session;const chunks=await stopRecorderCollect();stopStream();stopMeter();unlockWake();playChime();const audio=memChunks.length?new Blob(memChunks,{type:mime||''}):(chunks.length?new Blob(chunks.map(c=>c.blob),{type:mime||''}):null);const transcript=linesToText(lines);$('rec').classList.remove('on');$('rec').setAttribute('aria-pressed','false');$('rec').textContent='録音';if(!transcript&&!audio){await clearSession(sid);session='';status('音声も文字も取れませんでした。');renderLive();return}const meeting={id:uid(),title:$('timer').dataset.title||titleNow(),createdAt:new Date().toISOString(),durationMs:elapsedMs,transcript,minutes:MINUTES,audio,mime:mime||''};await idbPut('meetings',meeting);await clearSession(sid);session='';await refresh();openMeeting(meeting.id);document.body.classList.add('tab-list');$('tabRec').classList.remove('on');$('tabList').classList.add('on');status('保存しました。会議の画面で文字を直せます。');renderLive()}
-function onRecClick(){if(recording){stopAll().catch(e=>status(micHelp(e)));return}if(!beginSessionSync())return;finishStart()}
+function onRecClick(){try{if(recording){stopAll().catch(e=>status(micHelp(e)));return}if(!beginSessionSync())return;finishStart()}catch(e){recording=false;wantListen=false;try{setHear(false)}catch(e2){}status('始められませんでした。もう一度押してください。')}}
 function micHelp(e){const name=e&&e.name;if(name==='NotAllowedError'||name==='PermissionDeniedError'||name==='SecurityError')return 'マイクが使えません。iPhoneはアドレスバー左の「ぁあ」、PCは鍵マークから、マイクを許可してもう一度押してください。';if(name==='NotFoundError')return 'マイクが見つかりません。';return 'マイクを開始できませんでした。もう一度押してください。'}
 async function refresh(){meetings=await idbAll('meetings');meetings.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));renderList()}
-function renderList(){const q=($('q').value||'').trim();const box=$('list');box.replaceChildren();const rows=meetings.filter(m=>!q||(m.title||'').includes(q)||(m.transcript||'').includes(q)||(m.minutes||'').includes(q));if(!rows.length){const p=document.createElement('p');p.textContent=q?'見つかりません。':'まだ会議はありません。';box.append(p);return}rows.forEach(m=>{const b=document.createElement('button');b.type='button';b.className='meeting';b.dataset.id=m.id;const when=new Date(m.createdAt);const whenText=isNaN(when.getTime())?m.createdAt:when.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});b.innerHTML='<b></b><span></span>';b.querySelector('b').textContent=m.title||'無題';b.querySelector('span').textContent=whenText+'　'+durLabel(m.durationMs||0);b.onclick=()=>openMeeting(m.id);box.append(b)})}
+function clearKids(node){if(!node)return;if(node.replaceChildren){node.replaceChildren();return}while(node.firstChild)node.removeChild(node.firstChild)}
+function renderList(){const qEl=$('q');const q=(qEl&&qEl.value||'').trim();const box=$('list');if(!box)return;clearKids(box);const rows=meetings.filter(m=>!q||(m.title||'').includes(q)||(m.transcript||'').includes(q)||(m.minutes||'').includes(q));if(!rows.length){const p=document.createElement('p');p.textContent=q?'見つかりません。':'まだ会議はありません。';box.append(p);return}rows.forEach(m=>{const b=document.createElement('button');b.type='button';b.className='meeting';b.dataset.id=m.id;const when=new Date(m.createdAt);const whenText=isNaN(when.getTime())?m.createdAt:when.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});b.innerHTML='<b></b><span></span>';b.querySelector('b').textContent=m.title||'無題';b.querySelector('span').textContent=whenText+'　'+durLabel(m.durationMs||0);onTap(b,()=>openMeeting(m.id));box.append(b)})}
 function openMeeting(id){current=meetings.find(m=>m.id===id)||null;if(!current)return;$('listView').hidden=true;$('detailView').hidden=false;$('title').value=current.title||'';$('transcript').value=current.transcript||'';$('minutes').value=current.minutes||MINUTES;$('meta').textContent=durLabel(current.durationMs||0)+(current.audio?'　音声あり':'　音声なし');$('saved').textContent='';$('saveAudio').disabled=!current.audio;document.body.classList.add('tab-list');$('tabRec').classList.remove('on');$('tabList').classList.add('on')}
 function showList(){$('detailView').hidden=true;$('listView').hidden=false;current=null}
 let editTimer=0;
@@ -286,37 +288,52 @@ async function removeCurrent(){$('confirm').hidden=true;if(!current)return;const
 async function copyMinutes(){if(!current)return;const text=PROMPT+'\n\n'+(current.transcript||'');const ok=await copyText(text);status(ok?'議事録用の文をコピーしました。':'コピーできませんでした。文字起こしを選択してコピーしてください。');if(!muted){await ensureCtx();playChime()}}
 async function copyAll(){if(!current)return;const text=(current.transcript||'')+'\n\n'+(current.minutes||'');const ok=await copyText(text);status(ok?'全文をコピーしました。':'コピーできませんでした。')}
 function ensureCtx(){if(!audioCtx)audioCtx=new AudioContext();return audioCtx.state==='suspended'?audioCtx.resume():Promise.resolve()}
-function applyWide(){document.body.classList.toggle('wide',matchMedia('(min-width:900px)').matches)}
-$('rec').onclick=()=>{onRecClick()};
-function setMode(next){if(recording)return;if(next==='listen'&&!SR){$('speechNote').hidden=false;status('このブラウザではリアルタイム文字起こしが使えません。録音だけ行えます。');next='audio'}$('modeListen').classList.toggle('on',next==='listen');$('modeAudio').classList.toggle('on',next==='audio');$('modeListen').setAttribute('aria-pressed',next==='listen'?'true':'false');$('modeAudio').setAttribute('aria-pressed',next==='audio'?'true':'false');$('audioHint').hidden=next!=='audio';mode=next;if(!SR)$('speechNote').hidden=false}
-$('modeListen').onclick=()=>setMode('listen');
-$('modeAudio').onclick=()=>setMode('audio');
-$('resumeListen').onclick=()=>{if(!SR)return;restartFails=0;sawStart=false;try{armRecognitionSync();hideResume()}catch(e){showErr((e&&e.name)||'start-failed');status('もう一度タップしてください。');showResume()}};
-$('copyLink').onclick=async()=>{const ok=await copyText(location.href);status(ok?'リンクをコピーしました。':'アドレスを長押ししてコピーしてください。')};
-$('mute').onclick=async()=>{muted=!muted;setKey('mute',muted?'1':'0');paintMute();if(!muted){await ensureCtx();playChime()}};
-$('guideOk').onclick=()=>{$('guide').hidden=true;setKey('guide','1')};
-$('tabRec').onclick=()=>{document.body.classList.remove('tab-list');$('tabRec').classList.add('on');$('tabList').classList.remove('on')};
-$('tabList').onclick=()=>{document.body.classList.add('tab-list');$('tabList').classList.add('on');$('tabRec').classList.remove('on')};
-$('q').addEventListener('input',renderList);
-$('back').onclick=()=>{saveEdits().finally(showList)};
-$('title').addEventListener('change',saveEdits);
-$('transcript').addEventListener('input',scheduleSave);
-$('minutes').addEventListener('input',scheduleSave);
-$('copyMinutes').onclick=copyMinutes;
-$('copyAll').onclick=copyAll;
-$('saveTxt').onclick=()=>{if(!current)return;downloadText(current.transcript||'',safeName(current.title)+'-文字起こし.txt','text/plain')};
-$('saveMd').onclick=()=>{if(!current)return;downloadText('# '+current.title+'\n\n'+(current.minutes||''),safeName(current.title)+'-議事録.md','text/markdown')};
-$('saveAudio').onclick=()=>{if(!current||!current.audio)return;const ext=fileExt(current.mime||current.audio.type);shareOrDownload(current.audio,safeName(current.title)+'.'+ext,current.title)};
-$('remove').onclick=askRemove;
-$('confirmCancel').onclick=()=>{$('confirm').hidden=true};
-$('confirmOk').onclick=()=>{removeCurrent().catch(()=>status('削除できませんでした。'))};
-$('recoverDo').onclick=()=>{recoverNow().catch(()=>status('復旧できませんでした。'))};
-$('recoverSkip').onclick=()=>{discardRecovery().catch(()=>{})};
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&recording)lockWake()});
-addEventListener('beforeunload',e=>{if(recording){e.preventDefault();e.returnValue=''}});
-function setupEntry(){const ua=navigator.userAgent;const embedded=/Line\/|FBAN|FBAV|Instagram/i.test(ua);if(embedded){const u=new URL(location.href);u.searchParams.set('openExternalBrowser','1');$('openSafari').href=u.toString();$('inapp').hidden=false}if(!SR){setMode('audio');$('speechNote').hidden=false}else setMode(isiOS?'listen':'listen')}
-async function init(){applyWide();matchMedia('(min-width:900px)').addEventListener('change',applyWide);muted=key('mute')==='1';paintMute();if(key('guide')==='1')$('guide').hidden=true;setupEntry();await openDb();await checkRecovery();await refresh()}
-init().catch(()=>status('このブラウザでは保存の準備ができませんでした。'));
+function applyWide(){let wide=false;try{wide=matchMedia('(min-width:900px)').matches&&window.innerWidth>=900}catch(e){wide=window.innerWidth>=900}document.body.classList.toggle('wide',!!wide)}
+function setMode(next){if(recording)return;if(next==='listen'&&!SR){$('speechNote').hidden=false;status('このブラウザではリアルタイム文字起こしが使えません。録音だけ行えます。');next='audio'}const listen=$('modeListen'),audio=$('modeAudio');if(listen){listen.classList.toggle('on',next==='listen');listen.setAttribute('aria-pressed',next==='listen'?'true':'false')}if(audio){audio.classList.toggle('on',next==='audio');audio.setAttribute('aria-pressed',next==='audio'?'true':'false')}const hint=$('audioHint');if(hint)hint.hidden=next!=='audio';mode=next;if(!SR){const note=$('speechNote');if(note)note.hidden=false}}
+function onTap(el,fn){if(!el||el.__mojiTap)return;el.__mojiTap=1;let sx=0,sy=0,stamp=0;const invoke=kind=>{const now=Date.now();if(kind==='click'){if(now-stamp<1000)return}else if(now-stamp<30)return;stamp=now;try{const ret=fn();if(ret&&typeof ret.catch==='function')ret.catch(()=>{})}catch(e){try{status('操作できませんでした。')}catch(e2){}}};const point=ev=>{if(!ev)return null;if(ev.changedTouches&&ev.changedTouches[0])return ev.changedTouches[0];if(ev.touches&&ev.touches[0])return ev.touches[0];return ev};const arm=ev=>{const p=point(ev);if(!p)return;sx=p.clientX;sy=p.clientY};const lift=ev=>{const p=point(ev);if(!p)return;if(Math.abs(p.clientX-sx)>18||Math.abs(p.clientY-sy)>18)return;invoke('pointer')};try{el.addEventListener('pointerdown',arm)}catch(e){}try{el.addEventListener('pointerup',lift)}catch(e){}try{el.addEventListener('touchstart',arm,{passive:true})}catch(e){}try{el.addEventListener('touchend',lift,{passive:true})}catch(e){}try{el.addEventListener('click',()=>invoke('click'))}catch(e){}}
+function wireUi(){
+  const tap=(id,fn)=>{try{onTap($(id),fn)}catch(e){}};
+  tap('mute',()=>{muted=!muted;try{setKey('mute',muted?'1':'0')}catch(e){}paintMute();if(!muted)ensureCtx().then(playChime).catch(()=>{})});
+  tap('guideOk',()=>{$('guide').hidden=true;try{setKey('guide','1')}catch(e){}});
+  tap('tabRec',()=>{document.body.classList.remove('tab-list');$('tabRec').classList.add('on');$('tabList').classList.remove('on')});
+  tap('tabList',()=>{document.body.classList.add('tab-list');$('tabList').classList.add('on');$('tabRec').classList.remove('on')});
+  tap('modeListen',()=>setMode('listen'));
+  tap('modeAudio',()=>setMode('audio'));
+  tap('rec',()=>{onRecClick()});
+  tap('resumeListen',()=>{if(!SR)return;restartFails=0;sawStart=false;try{armRecognitionSync();hideResume()}catch(e){showErr((e&&e.name)||'start-failed');status('もう一度タップしてください。');showResume()}});
+  tap('copyLink',async()=>{const ok=await copyText(location.href);status(ok?'リンクをコピーしました。':'アドレスを長押ししてコピーしてください。')});
+  tap('back',()=>{saveEdits().finally(showList)});
+  tap('copyMinutes',copyMinutes);
+  tap('copyAll',copyAll);
+  tap('saveTxt',()=>{if(!current)return;downloadText(current.transcript||'',safeName(current.title)+'-文字起こし.txt','text/plain')});
+  tap('saveMd',()=>{if(!current)return;downloadText('# '+current.title+'\n\n'+(current.minutes||''),safeName(current.title)+'-議事録.md','text/markdown')});
+  tap('saveAudio',()=>{if(!current||!current.audio)return;const ext=fileExt(current.mime||current.audio.type);shareOrDownload(current.audio,safeName(current.title)+'.'+ext,current.title)});
+  tap('remove',askRemove);
+  tap('confirmCancel',()=>{$('confirm').hidden=true});
+  tap('confirmOk',()=>{removeCurrent().catch(()=>status('削除できませんでした。'))});
+  tap('recoverDo',()=>{recoverNow().catch(()=>status('復旧できませんでした。'))});
+  tap('recoverSkip',()=>{discardRecovery().catch(()=>{})});
+  try{$('q').addEventListener('input',()=>{try{renderList()}catch(e){}})}catch(e){}
+  try{$('title').addEventListener('change',()=>{saveEdits().catch(()=>{})})}catch(e){}
+  try{$('transcript').addEventListener('input',scheduleSave)}catch(e){}
+  try{$('minutes').addEventListener('input',scheduleSave)}catch(e){}
+}
+function setupEntry(){let embedded=false;try{embedded=/Line\/|FBAN|FBAV|Instagram/i.test(navigator.userAgent||'')}catch(e){embedded=false}if(embedded){try{const u=new URL(location.href);u.searchParams.set('openExternalBrowser','1');$('openSafari').href=u.toString();$('inapp').hidden=false}catch(e){$('inapp').hidden=false}}if(!SR){setMode('audio');const note=$('speechNote');if(note)note.hidden=false}else setMode('listen')}
+function safeStep(fn){try{fn()}catch(e){}}
+async function init(){
+  safeStep(applyWide);
+  safeStep(()=>{const mq=matchMedia('(min-width:900px)');if(mq.addEventListener)mq.addEventListener('change',applyWide);else if(mq.addListener)mq.addListener(applyWide)});
+  safeStep(()=>{muted=key('mute')==='1';paintMute()});
+  safeStep(()=>{if(key('guide')==='1')$('guide').hidden=true});
+  safeStep(setupEntry);
+  try{await openDb()}catch(e){status('このブラウザでは保存の準備ができませんでした。');return}
+  try{await checkRecovery()}catch(e){}
+  try{await refresh()}catch(e){status('会議の読み込みに失敗しました。')}
+}
+safeStep(()=>{document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&recording)lockWake()})});
+safeStep(()=>{addEventListener('beforeunload',e=>{if(recording){e.preventDefault();e.returnValue=''}})});
+wireUi();
+init();
 })();
 </script>
 </body>
