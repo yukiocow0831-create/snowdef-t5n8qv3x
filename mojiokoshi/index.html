@@ -27,6 +27,17 @@ header{display:flex;align-items:center;gap:12px;background:linear-gradient(120de
 h1{font-size:32px;line-height:1.1;margin:0}
 h1 small{display:block;margin-top:4px;font-size:16px;font-weight:600;color:#f6e7c1}
 #mute{margin-left:auto;background:#fff;color:#1e2a5a;padding:8px 14px;font-size:16px;font-weight:700;white-space:nowrap}
+.modes{display:flex;gap:8px;width:100%}
+.mode{flex:1;background:#efe8da;font-weight:800;font-size:16px;line-height:1.25;padding:10px 8px}
+.mode.on{background:#1e2a5a;color:#fff}
+#hear{font-size:22px;font-weight:800;color:#0f6e6a;margin:0}
+#hear.on{animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.28}}
+#resumeListen{width:100%;font-size:20px}
+a.primary,a.ghost{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:48px;border-radius:14px;font-weight:800;padding:8px 12px}
+details{margin-top:12px;background:#fff;border-radius:16px;padding:4px 14px 8px}
+summary{min-height:48px;display:flex;align-items:center;font-size:18px;font-weight:800;cursor:pointer}
+#help li{margin:8px 0;font-size:16px}
 .tabs{display:flex;gap:8px;margin:12px 0}
 .tabs button{flex:1;background:#fff;font-weight:800;font-size:18px;box-shadow:0 2px 0 #e4dccb}
 .tabs button.on{background:#1e2a5a;color:#fff}
@@ -77,8 +88,15 @@ body:not(.wide):not(.tab-list) #side{display:none}
   <header>
     <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#fff"/><rect x="26" y="12" width="12" height="22" rx="6" fill="#1e2a5a"/><path d="M20 30a12 12 0 0 0 24 0" fill="none" stroke="#1e2a5a" stroke-width="3"/><path d="M32 42v8M24 50h16" stroke="#c8962e" stroke-width="3" stroke-linecap="round"/></svg>
     <h1>もじメモ<small>録音して、文字にして、議事録にする</small></h1>
-    <button id="mute" type="button" aria-pressed="false">音 オン</button>
+    <button id="mute" type="button" aria-pressed="false">音オン</button>
   </header>
+  <div id="inapp" class="banner" hidden>
+    <p><b>文字起こしはSafariで開くと使えます</b></p>
+    <div class="row">
+      <a id="openSafari" class="primary" href="">Safariで開く</a>
+      <button id="copyLink" class="ghost" type="button">リンクをコピー</button>
+    </div>
+  </div>
   <div class="tabs" role="tablist">
     <button id="tabRec" class="on" type="button">録音</button>
     <button id="tabList" type="button">会議</button>
@@ -102,13 +120,20 @@ body:not(.wide):not(.tab-list) #side{display:none}
         </div>
       </div>
       <div class="card recWrap">
+        <div class="modes" role="group" aria-label="動き方">
+          <button id="modeListen" class="mode on" type="button" aria-pressed="true">文字起こし（おすすめ）</button>
+          <button id="modeAudio" class="mode" type="button" aria-pressed="false">録音だけ</button>
+        </div>
+        <p id="audioHint" class="warn" hidden>録音ファイルを保存してアプリ開発くんに送れば文字にできます</p>
         <button id="rec" type="button" aria-pressed="false">録音</button>
+        <p id="hear" class="hear" hidden>聞き取り中…</p>
         <p id="timer">00:00</p>
         <div class="meter" aria-hidden="true"><div id="meterBar"></div></div>
-        <p id="status" role="status">赤いボタンで録音を始めます。</p>
+        <p id="status" role="status">赤いボタンで始めます。</p>
         <p id="speechNote" class="warn" hidden>このブラウザではリアルタイム文字起こしが使えません。録音だけ行えます。</p>
         <p id="bothNote" class="warn" hidden>この端末では録音と文字起こしを同時にできないため、文字起こしを優先しています。</p>
         <div id="live" aria-live="polite">ここに文字起こしが出ます。</div>
+        <button id="resumeListen" class="gold" type="button" hidden>タップして文字起こしを再開</button>
       </div>
     </section>
     <section id="side">
@@ -141,6 +166,15 @@ body:not(.wide):not(.tab-list) #side{display:none}
       </div>
     </section>
   </div>
+  <details id="help">
+    <summary>うまくいかないとき</summary>
+    <ol>
+      <li>iPhoneの「設定」→「一般」→「キーボード」で「音声入力」をオンにしてください。</li>
+      <li>「設定」→「Safari」→「マイク」を「許可」にしてください。</li>
+      <li>LINEやInstagramの中ではなく、Safariで開いてください。</li>
+    </ol>
+    <p id="errCode">エラーコード: なし</p>
+  </details>
   <p class="legal">データはこの端末の中だけに保存されます。リアルタイム文字起こしは、端末のしくみによってはApple等の音声認識サーバーを使います。</p>
 </div>
 <div id="confirm" hidden role="dialog" aria-modal="true" aria-labelledby="confirmText">
@@ -173,6 +207,7 @@ const PROMPT='以下の会議の文字起こしを議事録にまとめてくだ
 const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 let dbp,recording=false,wantListen=false,busy=false,session='',startedPerf=0,elapsedMs=0;
 let lines=[],interim='',mime='',micStream=null,recorder=null,rec=null,chunkN=0,memChunks=[];
+let mode='listen',restartFails=0,fakeMeterOn=false,lastError='',skipEndRestart=false,sawStart=false;
 let audioCtx=null,analyser=null,meterOn=false,wakeLock=null,meetings=[],current=null,muted=false,saveTimer=0;
 const key=k=>localStorage.getItem('mojiMemo.'+k);
 const setKey=(k,v)=>localStorage.setItem('mojiMemo.'+k,v);
@@ -199,7 +234,23 @@ function unlockWake(){try{if(wakeLock)wakeLock.release()}catch{}wakeLock=null}
 function renderLive(){const done=linesToText(lines);$('live').innerHTML='';if(!done&&!interim){$('live').textContent=recording?'聞いています…':'ここに文字起こしが出ます。';return}if(done){$('live').textContent=done;if(interim)$('live').append(document.createTextNode('\n'))}if(interim){const s=document.createElement('span');s.className='interim';s.textContent=interim;$('live').append(s)}$('live').scrollTop=$('live').scrollHeight}
 function startMeter(stream){if(!audioCtx)return;try{const src=audioCtx.createMediaStreamSource(stream);analyser=audioCtx.createAnalyser();analyser.fftSize=256;src.connect(analyser);const data=new Uint8Array(analyser.fftSize);meterOn=true;const loop=()=>{if(!meterOn||!analyser)return;analyser.getByteTimeDomainData(data);let sum=0;for(let i=0;i<data.length;i++){const v=(data[i]-128)/128;sum+=v*v}const pct=Math.min(100,Math.round(Math.sqrt(sum/data.length)*240));$('meterBar').style.width=pct+'%';requestAnimationFrame(loop)};requestAnimationFrame(loop)}catch{}}
 function stopMeter(){meterOn=false;analyser=null;$('meterBar').style.width='0%'}
-function startListen(){if(!SR||!wantListen)return;try{rec=new SR();rec.lang='ja-JP';rec.continuous=true;rec.interimResults=true;rec.onresult=ev=>{let next='';for(let i=ev.resultIndex;i<ev.results.length;i++){const piece=ev.results[i][0].transcript.trim();if(!piece)continue;if(ev.results[i].isFinal){lines.push({sec:Math.floor((performance.now()-startedPerf)/1000),text:piece});interim=''}else next+=piece}interim=next;renderLive()};rec.onerror=ev=>{if(ev.error==='not-allowed'){wantListen=false;status('マイクが許可されていません。文字起こしを止めました。')}else if(ev.error==='audio-capture'&&recorder&&recording){preferListen();setTimeout(startListen,400)}};rec.onend=()=>{if(wantListen)setTimeout(startListen,300)};rec.start()}catch{if(wantListen)setTimeout(startListen,800)}}
+function setHear(on){$('hear').hidden=!on;$('hear').classList.toggle('on',!!on)}
+function showResume(){$('resumeListen').hidden=false}
+function hideResume(){$('resumeListen').hidden=true}
+function showErr(code){lastError=code||'unknown';$('errCode').textContent='エラーコード: '+lastError}
+function startFakeMeter(){if(fakeMeterOn)return;fakeMeterOn=true;const loop=()=>{if(!fakeMeterOn)return;const pct=30+Math.round(24*Math.abs(Math.sin(performance.now()/180)));$('meterBar').style.width=pct+'%';requestAnimationFrame(loop)};requestAnimationFrame(loop)}
+function stopFakeMeter(){fakeMeterOn=false;if(!analyser)$('meterBar').style.width='0%'}
+function wireRec(r){
+  r.onstart=()=>{sawStart=true;restartFails=0;hideResume();setHear(true);status('聞き取り中…')};
+  r.onaudiostart=()=>{setHear(true);if(!micStream)startFakeMeter()};
+  r.onspeechstart=()=>{setHear(true);status('話しています…')};
+  r.onresult=ev=>{let next='';for(let i=ev.resultIndex;i<ev.results.length;i++){const piece=(ev.results[i][0]&&ev.results[i][0].transcript||'').trim();if(!piece)continue;if(ev.results[i].isFinal){lines.push({sec:Math.floor((performance.now()-startedPerf)/1000),text:piece});interim=''}else next+=piece}interim=next;renderLive()};
+  r.onerror=ev=>{skipEndRestart=true;handleRecError(ev.error||'')};
+  r.onend=()=>{if(!wantListen)return;if(skipEndRestart){skipEndRestart=false;return}if(!sawStart){restartFails++;if(restartFails>=2){showResume();return}}sawStart=false;scheduleRestart()};
+}
+function armRecognitionSync(){if(!SR)throw new Error('no-sr');wantListen=true;rec=new SR();rec.lang='ja-JP';rec.continuous=true;rec.interimResults=true;wireRec(rec);rec.start();setHear(true);status('聞き取り中…')}
+function scheduleRestart(){if(!wantListen)return;setTimeout(()=>{if(!wantListen)return;try{armRecognitionSync()}catch(e){restartFails++;showErr((e&&e.name)||'start-failed');if(restartFails>=2)showResume();else scheduleRestart()}},300)}
+function handleRecError(code){showErr(code);if(code==='no-speech'){scheduleRestart();return}if(code==='aborted'){if(wantListen)scheduleRestart();return}if(code==='not-allowed'||code==='service-not-allowed'){status('iPhoneの「設定」→「一般」→「キーボード」で「音声入力」をオン、「設定」→「Safari」→「マイク」を「許可」に');showResume();return}if(code==='network'){status('インターネットにつながっているか確かめて');restartFails++;if(restartFails>=2)showResume();else scheduleRestart();return}if(code==='audio-capture'){status('他のアプリがマイクを使っています');if(recorder&&mode==='listen'&&!isiOS){preferListen();setTimeout(()=>{try{armRecognitionSync()}catch(e){restartFails++;if(restartFails>=2)showResume()}},400);return}restartFails++;if(restartFails>=2)showResume();else scheduleRestart();return}status('文字起こしが止まりました（'+code+'）');restartFails++;if(restartFails>=2)showResume();else scheduleRestart()}
 function preferListen(){if(!recorder)return;try{recorder.onstop=null;recorder.stop()}catch{}recorder=null;stopStream();stopMeter();$('bothNote').hidden=false;status('文字起こしを続けます。音声ファイルは残りません。')}
 function stopStream(){if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}}
 async function persistRecovery(){if(!session)return;await idbPut('recovery',{id:'open',session,startedAt:session,elapsedMs,mime,lines,interim,title:$('timer').dataset.title||titleNow()})}
@@ -214,11 +265,14 @@ async function shareOrDownload(blob,filename,title){const file=new File([blob],f
 function downloadText(text,filename,type){shareOrDownload(new Blob([text],{type}),filename,'もじメモ')}
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch{}const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch{}ta.remove();return ok}
 function refreshTimer(){elapsedMs=performance.now()-startedPerf;$('timer').textContent=clock(elapsedMs)}
-async function startAll(){if(!$('recover').hidden){status('先に「復旧」か「捨てる」を選んでください。');return}await ensureCtx();playChime();let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){status(micHelp(e));return}micStream=stream;startMeter(stream);await lockWake();recording=true;wantListen=true;startedPerf=performance.now();elapsedMs=0;session=uid();lines=[];interim='';chunkN=0;memChunks=[];mime=pickMime();const title=titleNow();$('timer').dataset.title=title;$('speechNote').hidden=!!SR;$('bothNote').hidden=true;if(SR)startListen();else $('speechNote').hidden=false;if(typeof MediaRecorder!=='undefined'){try{recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);mime=recorder.mimeType||mime;recorder.ondataavailable=ev=>{addChunk(ev.data).catch(()=>{})};recorder.onerror=()=>preferListen();try{recorder.start(20000)}catch{recorder.start()}}catch{preferListen()}}else preferListen();await persistRecovery();saveTimer=setInterval(()=>{refreshTimer();persistRecovery().catch(()=>{})},5000);$('rec').classList.add('on');$('rec').setAttribute('aria-pressed','true');$('rec').textContent='停止';status(SR?'録音と文字起こしをしています。':'録音しています。');renderLive();tick()}
+function captureWanted(){if(mode==='audio')return true;if(isiOS)return false;return !!SR}
+async function startCapture(){let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){if(mode==='listen'){$('bothNote').hidden=false;status('文字起こしを続けます。音声ファイルは残りません。');startFakeMeter();return}status(micHelp(e));return}micStream=stream;startMeter(stream);if(mode==='audio'||typeof MediaRecorder==='undefined'){if(typeof MediaRecorder==='undefined'&&mode==='audio'){status('このブラウザでは録音ファイルを作れません。');return}}if(typeof MediaRecorder==='undefined'){preferListen();return}try{recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);mime=recorder.mimeType||mime;recorder.ondataavailable=ev=>{addChunk(ev.data).catch(()=>{})};recorder.onerror=()=>{if(mode==='listen')preferListen()};try{recorder.start(20000)}catch{recorder.start()}}catch{if(mode==='listen')preferListen();else status('録音を開始できませんでした。')}}
+function beginSessionSync(){if(!$('recover').hidden){status('先に「復旧」か「捨てる」を選んでください。');return false}recording=true;wantListen=mode==='listen'&&!!SR;startedPerf=performance.now();elapsedMs=0;session=uid();lines=[];interim='';chunkN=0;memChunks=[];restartFails=0;sawStart=false;mime=pickMime();const title=titleNow();$('timer').dataset.title=title;$('rec').classList.add('on');$('rec').setAttribute('aria-pressed','true');$('rec').textContent='停止';hideResume();$('bothNote').hidden=true;renderLive();if(mode==='listen'&&SR){try{armRecognitionSync()}catch(e){showErr((e&&e.name)||'start-failed');status('文字起こしを開始できませんでした。下のボタンでもう一度。');showResume()}}else if(!SR){$('speechNote').hidden=false;status('録音しています。')}else status('録音しています。');tick();return true}
+async function finishStart(){busy=true;try{await ensureCtx();playChime();await lockWake();if(captureWanted())await startCapture();else startFakeMeter();await persistRecovery();saveTimer=setInterval(()=>{refreshTimer();persistRecovery().catch(()=>{})},5000)}catch(e){status(micHelp(e))}finally{busy=false}}
 function tick(){if(!recording)return;refreshTimer();requestAnimationFrame(tick)}
 async function stopRecorderCollect(){if(!recorder)return chunksOf(session);const recRef=recorder;await new Promise(resolve=>{recRef.onstop=()=>resolve();try{if(recRef.state==='recording')recRef.requestData()}catch{}try{if(recRef.state!=='inactive')recRef.stop();else resolve()}catch{resolve()}});recorder=null;return chunksOf(session)}
-async function stopAll(){recording=false;wantListen=false;clearInterval(saveTimer);saveTimer=0;try{if(rec)rec.stop()}catch{}rec=null;const sid=session;const chunks=await stopRecorderCollect();stopStream();stopMeter();unlockWake();playChime();const audio=memChunks.length?new Blob(memChunks,{type:mime||''}):(chunks.length?new Blob(chunks.map(c=>c.blob),{type:mime||''}):null);const transcript=linesToText(lines);$('rec').classList.remove('on');$('rec').setAttribute('aria-pressed','false');$('rec').textContent='録音';if(!transcript&&!audio){await clearSession(sid);session='';status('音声も文字も取れませんでした。');renderLive();return}const meeting={id:uid(),title:$('timer').dataset.title||titleNow(),createdAt:new Date().toISOString(),durationMs:elapsedMs,transcript,minutes:MINUTES,audio,mime:mime||''};await idbPut('meetings',meeting);await clearSession(sid);session='';await refresh();openMeeting(meeting.id);document.body.classList.add('tab-list');$('tabRec').classList.remove('on');$('tabList').classList.add('on');status('保存しました。会議の画面で文字を直せます。');renderLive()}
-async function toggleRec(){if(busy)return;busy=true;try{if(recording)await stopAll();else await startAll()}catch(e){status(micHelp(e));recording=false}finally{busy=false}}
+async function stopAll(){recording=false;wantListen=false;setHear(false);hideResume();stopFakeMeter();clearInterval(saveTimer);saveTimer=0;try{if(rec)rec.stop()}catch{}rec=null;const sid=session;const chunks=await stopRecorderCollect();stopStream();stopMeter();unlockWake();playChime();const audio=memChunks.length?new Blob(memChunks,{type:mime||''}):(chunks.length?new Blob(chunks.map(c=>c.blob),{type:mime||''}):null);const transcript=linesToText(lines);$('rec').classList.remove('on');$('rec').setAttribute('aria-pressed','false');$('rec').textContent='録音';if(!transcript&&!audio){await clearSession(sid);session='';status('音声も文字も取れませんでした。');renderLive();return}const meeting={id:uid(),title:$('timer').dataset.title||titleNow(),createdAt:new Date().toISOString(),durationMs:elapsedMs,transcript,minutes:MINUTES,audio,mime:mime||''};await idbPut('meetings',meeting);await clearSession(sid);session='';await refresh();openMeeting(meeting.id);document.body.classList.add('tab-list');$('tabRec').classList.remove('on');$('tabList').classList.add('on');status('保存しました。会議の画面で文字を直せます。');renderLive()}
+function onRecClick(){if(recording){stopAll().catch(e=>status(micHelp(e)));return}if(!beginSessionSync())return;finishStart()}
 function micHelp(e){const name=e&&e.name;if(name==='NotAllowedError'||name==='PermissionDeniedError'||name==='SecurityError')return 'マイクが使えません。iPhoneはアドレスバー左の「ぁあ」、PCは鍵マークから、マイクを許可してもう一度押してください。';if(name==='NotFoundError')return 'マイクが見つかりません。';return 'マイクを開始できませんでした。もう一度押してください。'}
 async function refresh(){meetings=await idbAll('meetings');meetings.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));renderList()}
 function renderList(){const q=($('q').value||'').trim();const box=$('list');box.replaceChildren();const rows=meetings.filter(m=>!q||(m.title||'').includes(q)||(m.transcript||'').includes(q)||(m.minutes||'').includes(q));if(!rows.length){const p=document.createElement('p');p.textContent=q?'見つかりません。':'まだ会議はありません。';box.append(p);return}rows.forEach(m=>{const b=document.createElement('button');b.type='button';b.className='meeting';b.dataset.id=m.id;const when=new Date(m.createdAt);const whenText=isNaN(when.getTime())?m.createdAt:when.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});b.innerHTML='<b></b><span></span>';b.querySelector('b').textContent=m.title||'無題';b.querySelector('span').textContent=whenText+'　'+durLabel(m.durationMs||0);b.onclick=()=>openMeeting(m.id);box.append(b)})}
@@ -233,7 +287,12 @@ async function copyMinutes(){if(!current)return;const text=PROMPT+'\n\n'+(curren
 async function copyAll(){if(!current)return;const text=(current.transcript||'')+'\n\n'+(current.minutes||'');const ok=await copyText(text);status(ok?'全文をコピーしました。':'コピーできませんでした。')}
 function ensureCtx(){if(!audioCtx)audioCtx=new AudioContext();return audioCtx.state==='suspended'?audioCtx.resume():Promise.resolve()}
 function applyWide(){document.body.classList.toggle('wide',matchMedia('(min-width:900px)').matches)}
-$('rec').onclick=()=>{toggleRec()};
+$('rec').onclick=()=>{onRecClick()};
+function setMode(next){if(recording)return;if(next==='listen'&&!SR){$('speechNote').hidden=false;status('このブラウザではリアルタイム文字起こしが使えません。録音だけ行えます。');next='audio'}$('modeListen').classList.toggle('on',next==='listen');$('modeAudio').classList.toggle('on',next==='audio');$('modeListen').setAttribute('aria-pressed',next==='listen'?'true':'false');$('modeAudio').setAttribute('aria-pressed',next==='audio'?'true':'false');$('audioHint').hidden=next!=='audio';mode=next;if(!SR)$('speechNote').hidden=false}
+$('modeListen').onclick=()=>setMode('listen');
+$('modeAudio').onclick=()=>setMode('audio');
+$('resumeListen').onclick=()=>{if(!SR)return;restartFails=0;sawStart=false;try{armRecognitionSync();hideResume()}catch(e){showErr((e&&e.name)||'start-failed');status('もう一度タップしてください。');showResume()}};
+$('copyLink').onclick=async()=>{const ok=await copyText(location.href);status(ok?'リンクをコピーしました。':'アドレスを長押ししてコピーしてください。')};
 $('mute').onclick=async()=>{muted=!muted;setKey('mute',muted?'1':'0');paintMute();if(!muted){await ensureCtx();playChime()}};
 $('guideOk').onclick=()=>{$('guide').hidden=true;setKey('guide','1')};
 $('tabRec').onclick=()=>{document.body.classList.remove('tab-list');$('tabRec').classList.add('on');$('tabList').classList.remove('on')};
@@ -255,7 +314,8 @@ $('recoverDo').onclick=()=>{recoverNow().catch(()=>status('復旧できません
 $('recoverSkip').onclick=()=>{discardRecovery().catch(()=>{})};
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&recording)lockWake()});
 addEventListener('beforeunload',e=>{if(recording){e.preventDefault();e.returnValue=''}});
-async function init(){applyWide();matchMedia('(min-width:900px)').addEventListener('change',applyWide);muted=key('mute')==='1';paintMute();if(key('guide')==='1')$('guide').hidden=true;if(!SR)$('speechNote').hidden=false;await openDb();await checkRecovery();await refresh()}
+function setupEntry(){const ua=navigator.userAgent;const embedded=/Line\/|FBAN|FBAV|Instagram/i.test(ua);if(embedded){const u=new URL(location.href);u.searchParams.set('openExternalBrowser','1');$('openSafari').href=u.toString();$('inapp').hidden=false}if(!SR){setMode('audio');$('speechNote').hidden=false}else setMode(isiOS?'listen':'listen')}
+async function init(){applyWide();matchMedia('(min-width:900px)').addEventListener('change',applyWide);muted=key('mute')==='1';paintMute();if(key('guide')==='1')$('guide').hidden=true;setupEntry();await openDb();await checkRecovery();await refresh()}
 init().catch(()=>status('このブラウザでは保存の準備ができませんでした。'));
 })();
 </script>
