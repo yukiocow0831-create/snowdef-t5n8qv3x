@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0A6FCB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="同窓会アンケート">
+<title>同窓会アンケート</title>
+<meta property="og:title" content="同窓会アンケート">
+<meta property="og:description" content="福岡・2027年10月〜11月の同窓会。会場・日程・ゴルフを、○△×で答えます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/dousoukai/">
+<meta property="og:image" content="https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/dousoukai/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="同窓会アンケート">
+<meta name="twitter:description" content="福岡・2027年10月〜11月の同窓会。会場・日程・ゴルフを、○△×で答えます。">
+<meta name="twitter:image" content="https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/dousoukai/ogp.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A6FCB'/%3E%3Ccircle cx='18' cy='24' r='8' fill='%23FFE14A'/%3E%3Ccircle cx='36' cy='20' r='7' fill='%23FF4D8D'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%233DCE6E'/%3E%3Cpath d='M14 46c6-8 30-8 36 0' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
+<style>
+:root{font-family:"Hiragino Sans","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#10233A;font-size:22px;line-height:1.45;background:#fff3c4}
+*{box-sizing:border-box}
+[hidden]{display:none!important;pointer-events:none!important}
+html,body{margin:0;background:#c8ecff;overscroll-behavior:none}
+body{min-height:100vh;padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(180deg,#c8ecff 0%,#ffe3f2 42%,#fff3c4 100%)}
+button,input,textarea{font:inherit;color:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button{border:0;cursor:pointer;min-height:64px;border-radius:18px;font-weight:800}
+input,textarea{width:100%;border:3px solid #0A6FCB;border-radius:18px;padding:16px;background:#fff;font-size:22px}
+textarea{min-height:96px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:4px solid #0A6FCB;outline-offset:3px}
+#app{max-width:640px;margin:0 auto}
+header{background:linear-gradient(120deg,#0A6FCB 0%,#C81E6A 52%,#C2410C 100%);color:#fff;border-radius:22px;padding:12px 16px;box-shadow:0 6px 0 #ffb3d9}
+header p{margin:2px 0 0;font-size:20px;color:#fff}
+h1{font-size:32px;line-height:1.2;margin:0}
+h2{font-size:28px;line-height:1.25;margin:0 0 4px;color:#0B4FBF}
+.banner{margin:6px 0;background:#FFE14A;border:3px solid #C2410C;border-radius:16px;padding:6px 10px;font-weight:800;text-align:center;color:#3A2500}
+body.asking header{padding:8px 14px}
+body.asking header p{display:none}
+body.asking h1{font-size:28px}
+.card{background:#fff;border:3px solid #7ec8ff;border-radius:22px;padding:14px;margin:8px 0;box-shadow:0 6px 0 #b7e4ff}
+.note{font-size:20px;color:#243044;margin:4px 0}
+.primary{width:100%;background:#0A6FCB;color:#fff;font-size:24px;min-height:72px;box-shadow:0 5px 0 #C81E6A}
+.ghost{background:#fff;color:#0A6FCB;box-shadow:inset 0 0 0 3px #0A6FCB;font-size:22px}
+.progress{margin:8px 0 4px}
+.progress b,#nameProgress{font-size:28px;font-weight:800;color:#0B4FBF}
+.bar{height:16px;background:#fff;border-radius:999px;overflow:hidden;margin-top:6px;box-shadow:inset 0 0 0 2px #7ec8ff}
+.bar span{display:block;height:100%;background:linear-gradient(90deg,#0A6FCB,#C81E6A,#E85D04);width:0}
+.nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.nav button{min-height:72px;font-size:24px}
+body.asking #askScreen{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+body.asking .nav{position:fixed;left:12px;right:12px;bottom:max(8px,env(safe-area-inset-bottom));margin:0;z-index:4;background:#fff3c4;padding-top:8px}
+.choice{width:100%;min-height:80px;font-size:26px;margin:4px 0;border-radius:18px;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px}
+.choice .sym{color:#fff;line-height:1}
+.choice.maru{background:#0E893E;box-shadow:0 4px 0 #087232}
+.choice.sankaku{background:#FFE14A;color:#3A2500;box-shadow:0 4px 0 #E0A100}
+.choice.sankaku .sym{background:#B45309;width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.choice.batsu{background:#E02D52;box-shadow:0 4px 0 #A31838}
+.choice.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 4px #10233A}
+.choice.plan{background:#C2410C;box-shadow:0 4px 0 #9A3412}
+.choice.plan[data-id="golfplan-zenjitsu"]{background:#0A6FCB;box-shadow:0 4px 0 #084E96}
+.choice.plan[data-id="golfplan-toujitsu"]{background:#C2410C;box-shadow:0 4px 0 #9A3412}
+.choice.plan[data-id="golfplan-nashi"]{background:#C81E6A;box-shadow:0 4px 0 #8E1450}
+.choice.on,.choice.plan.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 4px #10233A}
+.kicker{font-size:20px;font-weight:800;color:#0B4FBF;margin:0 0 6px}
+.summary p{margin:8px 0;font-size:22px}
+.done{position:fixed;inset:0;z-index:5;margin:0;border:0;border-radius:0;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(160deg,#bfe9ff 0%,#ffd0ea 46%,#fff3b0 100%);padding:max(28px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom));overflow:hidden}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;display:block;width:18px;height:18px;border-radius:4px}
+.confetti i:nth-child(1){left:6%;top:8%;background:#0A6FCB;transform:rotate(18deg)}
+.confetti i:nth-child(2){left:18%;top:18%;background:#FFE14A;border-radius:50%}
+.confetti i:nth-child(3){left:78%;top:7%;background:#E02D52;transform:rotate(30deg)}
+.confetti i:nth-child(4){left:88%;top:22%;background:#0E893E;border-radius:50%}
+.confetti i:nth-child(5){left:8%;top:72%;background:#C81E6A;transform:rotate(-20deg)}
+.confetti i:nth-child(6){left:22%;top:84%;background:#0A6FCB;border-radius:50%}
+.confetti i:nth-child(7){left:80%;top:70%;background:#FFE14A;transform:rotate(12deg)}
+.confetti i:nth-child(8){left:70%;top:86%;background:#E85D04;border-radius:50%}
+.confetti i:nth-child(9){left:46%;top:6%;background:#3DCE6E;transform:rotate(40deg)}
+.confetti i:nth-child(10){left:60%;top:16%;background:#FF4D8D;border-radius:50%}
+.confetti i:nth-child(11){left:4%;top:42%;background:#FF8A1A;border-radius:50%}
+.confetti i:nth-child(12){left:90%;top:48%;background:#7C5CFF;transform:rotate(25deg)}
+.done>*:not(.confetti){position:relative;z-index:1}
+.check{position:relative;width:140px;height:140px;border-radius:50%;background:conic-gradient(#0A6FCB,#3DCE6E,#FFE14A,#FF8A1A,#FF4D8D,#0A6FCB);box-shadow:0 10px 0 #ff9ec8;display:flex;align-items:center;justify-content:center}
+.check span{width:108px;height:108px;border-radius:50%;background:#fff;color:#0A6B2C;font-size:72px;line-height:108px;font-weight:800}
+.done h2{font-size:34px;color:#10233A;margin:16px 0}
+.done p{color:#10233A}
+.done .primary,.done .ghost{width:min(440px,92%);margin-top:12px}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tabs button{background:#fff;font-size:20px;padding:8px 4px}
+#tabVenue{color:#0B4FBF;box-shadow:inset 0 0 0 3px #0A6FCB}
+#tabDate{color:#0A6B2C;box-shadow:inset 0 0 0 3px #0E893E}
+#tabGolf{color:#C2410C;box-shadow:inset 0 0 0 3px #E85D04}
+#tabVenue.on{background:#0A6FCB;color:#fff;box-shadow:none}
+#tabDate.on{background:#0A6B2C;color:#fff;box-shadow:none}
+#tabGolf.on{background:#C2410C;color:#fff;box-shadow:none}
+.option{border:3px solid #7ec8ff;border-radius:20px;padding:14px;margin:12px 0;background:#fff;box-shadow:0 4px 0 #d6efff}
+.option.top{border-color:#0A6FCB;background:#e7f4ff}
+.badge{display:inline-block;background:#0A6FCB;color:#fff;border-radius:999px;padding:4px 12px;font-size:20px;font-weight:800}
+.option h3{margin:6px 0;font-size:24px;color:#10233A}
+.counts{font-size:22px;font-weight:800}
+.whoBtn,.linkish{width:100%;margin-top:8px;background:#fff;color:#0A6FCB;min-height:56px;font-size:20px;box-shadow:inset 0 0 0 3px #0A6FCB}
+.people p{margin:6px 0;font-size:22px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+#status{min-height:1.4em;font-size:22px;font-weight:800;text-align:center}
+.veil{position:fixed;inset:0;background:#10233a88;display:flex;align-items:flex-end;justify-content:center;padding:12px;z-index:6}
+.veil .card{width:min(560px,100%)}
+.error{background:#fff0f3;border:3px solid #E02D52}
+.error h2,.error p{color:#9F1239}
+a.share{display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:18px;background:#048A3C;color:#fff;font-weight:800;text-decoration:none;font-size:22px;margin-top:10px}
+body[data-section="name"] #nameScreen{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#0A6FCB,#E4377A,#FF8A1A) border-box;box-shadow:0 6px 0 #ffb3d9}
+body[data-section="name"] h2{color:#C81E6A}
+body[data-section="venue"] #askCard,body[data-section="venue"] .option,body[data-section="venue"] .who{border-color:#1A8CFF;box-shadow:0 6px 0 #8ec5ff}
+body[data-section="venue"] .option.top{border-color:#0A6FCB;background:#e7f4ff}
+body[data-section="venue"] h2,body[data-section="venue"] .kicker,body[data-section="venue"] .progress b{color:#0B4FBF}
+body[data-section="venue"] .bar{box-shadow:inset 0 0 0 2px #8ec5ff}
+body[data-section="venue"] .bar span{background:#0A6FCB}
+body[data-section="venue"] .badge{background:#0A6FCB}
+body[data-section="date"] #askCard,body[data-section="date"] .option,body[data-section="date"] .who{border-color:#3DCE6E;box-shadow:0 6px 0 #8ee6a8}
+body[data-section="date"] .option.top{border-color:#0A6B2C;background:#e5fbea}
+body[data-section="date"] h2,body[data-section="date"] .kicker,body[data-section="date"] .progress b{color:#0A6B2C}
+body[data-section="date"] .bar{box-shadow:inset 0 0 0 2px #8ee6a8}
+body[data-section="date"] .bar span{background:#0A6B2C}
+body[data-section="date"] .badge{background:#0A6B2C}
+body[data-section="golfPlan"] #askCard,body[data-section="golfPlan"] .option,body[data-section="golfPlan"] .who,body[data-section="golfCourse"] #askCard,body[data-section="golfCourse"] .option{border-color:#FF8A1A;box-shadow:0 6px 0 #ffc48a}
+body[data-section="golfPlan"] .option.top,body[data-section="golfCourse"] .option.top{border-color:#C2410C;background:#fff1e6}
+body[data-section="golfPlan"] h2,body[data-section="golfPlan"] .kicker,body[data-section="golfPlan"] .progress b,body[data-section="golfCourse"] h2,body[data-section="golfCourse"] .kicker,body[data-section="golfCourse"] .progress b{color:#C2410C}
+body[data-section="golfPlan"] .bar,body[data-section="golfCourse"] .bar{box-shadow:inset 0 0 0 2px #ffc48a}
+body[data-section="golfPlan"] .bar span,body[data-section="golfCourse"] .bar span{background:#C2410C}
+body[data-section="golfPlan"] .badge,body[data-section="golfCourse"] .badge{background:#C2410C}
+body[data-section="confirm"] #askCard{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#0A6FCB,#3DCE6E,#FF8A1A) border-box;box-shadow:0 6px 0 #ffb3d9}
+body[data-section="confirm"] h2,body[data-section="confirm"] .progress b{color:#C81E6A}
+body[data-section="confirm"] .bar span{background:linear-gradient(90deg,#0A6FCB,#3DCE6E,#FF8A1A)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>同窓会アンケート</h1>
+    <p>福岡・2027年10月〜11月</p>
+  </header>
+  <div id="demoBanner" class="banner" hidden>準備中（テスト表示）</div>
+  <div id="loading" class="banner" hidden>読み込んでいます…</div>
+  <div id="errorBox" class="card error" hidden>
+    <p id="errorText">読み込めませんでした。</p>
+    <button id="retry" class="primary" type="button">もう一度読み込む</button>
+  </div>
+
+  <section id="nameScreen" class="card" hidden>
+    <p id="nameProgress">1 / 18</p>
+    <div class="bar" aria-hidden="true"><span id="nameBar"></span></div>
+    <h2>お名前をどうぞ</h2>
+    <label for="nameInput">名前またはニックネーム</label>
+    <input id="nameInput" type="text" maxlength="30" autocomplete="nickname" enterkeyhint="done">
+    <p class="note">名前はみんなの結果に表示されます。電話番号やメールは入れないでください。</p>
+    <p class="note">名前を変えると、別の人として集計されます。</p>
+    <p id="nameMsg" class="note"></p>
+    <button id="nameNext" class="primary" type="button">つぎへ</button>
+  </section>
+
+  <section id="askScreen" hidden>
+    <div class="progress"><b id="progressText">1 / 1</b><div class="bar" aria-hidden="true"><span id="progressBar"></span></div></div>
+    <div class="card" id="askCard"></div>
+    <div class="nav">
+      <button id="back" class="ghost" type="button">もどる</button>
+      <button id="skip" class="ghost" type="button">つぎへ</button>
+    </div>
+    <button id="toResults" class="linkish" type="button">みんなの結果を見る</button>
+  </section>
+
+  <section id="doneScreen" class="done" hidden>
+    <div class="confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="check" aria-hidden="true"><span>✓</span></div>
+    <h2>投票しました！ありがとうございます</h2>
+    <p>回答を受け取りました。</p>
+    <button id="seeResults" class="primary" type="button">みんなの結果を見る</button>
+    <button id="redo" class="ghost" type="button">投票をやり直す</button>
+  </section>
+
+  <section id="failScreen" class="card error" hidden>
+    <h2>送れませんでした</h2>
+    <p id="failText">電波のよいところで、もう一度送ってください。</p>
+    <button id="resend" class="primary" type="button">もう一度送る</button>
+    <button id="failBack" class="ghost" type="button">もどる</button>
+  </section>
+
+  <section id="resultScreen" hidden>
+    <div class="who card"><span>いまの名前：<b id="whoName"></b></span></div>
+    <div class="tabs" role="tablist">
+      <button id="tabVenue" type="button">①会場</button>
+      <button id="tabDate" type="button">②日程</button>
+      <button id="tabGolf" type="button">③ゴルフ</button>
+    </div>
+    <div id="panel"></div>
+    <button id="refresh" class="primary" type="button">最新にする</button>
+    <button id="backToVote" class="ghost" type="button">投票をやり直す</button>
+    <p id="status" role="status"></p>
+    <a id="lineShare" class="share" href="https://social-plugins.line.me/lineit/share?url=https%3A%2F%2Fyukiocow0831-create.github.io%2Fsnowdef-t5n8qv3x%2Fdousoukai%2F">LINEで友だちに送る</a>
+  </section>
+
+  <div id="addDialog" class="veil" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+      <h2 id="addTitle">候補を追加</h2>
+      <label for="addLabel">候補の名前</label>
+      <input id="addLabel" type="text" maxlength="60">
+      <label for="addNote">メモ（なくても大丈夫）</label>
+      <textarea id="addNote" maxlength="100"></textarea>
+      <div class="row">
+        <button id="addCancel" class="ghost" type="button">やめる</button>
+        <button id="addSave" class="primary" type="button">追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{
+'use strict';
+const GAS_URL='https://script.google.com/macros/s/AKfycbxVJ_01-A171tSEsf5jnRrz9ipHDMVRtMQAh7REWCHM0I3eb6txkMg78hywHudd9oM49Q/exec';
+const PAGE='https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/dousoukai/';
+const LINE='https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(PAGE);
+const PRICE='料金は2026年の公表額です。2027年は変わることがあります。';
+const SEED=[
+  {id:'venue-oriental',category:'venue',label:'オリエンタルホテル福岡 博多ステーション',note:'筑紫口徒歩1分、同窓会プラン1人10,000円',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'venue-clio',category:'venue',label:'ホテルクリオコート博多',note:'博多駅徒歩30秒、7,000〜9,000円',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'venue-with',category:'venue',label:'WITH THE STYLE FUKUOKA',note:'貸切、8,800〜11,800円、客室16室のみ',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271002',category:'date',label:'10/2(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271009',category:'date',label:'10/9(土・3連休)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271016',category:'date',label:'10/16(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271023',category:'date',label:'10/23(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271030',category:'date',label:'10/30(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271106',category:'date',label:'11/6(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271113',category:'date',label:'11/13(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271120',category:'date',label:'11/20(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'date-20271127',category:'date',label:'11/27(土)',note:'2027年',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'golfplan-zenjitsu',category:'golfPlan',label:'前日ゴルフで2泊',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'golfplan-toujitsu',category:'golfPlan',label:'当日朝ゴルフで夕方合流',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'golfplan-nashi',category:'golfPlan',label:'ゴルフはしない',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'course-saitozaki',category:'golfCourse',label:'西戸崎シーサイドカントリークラブ',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'course-ito',category:'golfCourse',label:'伊都ゴルフ倶楽部',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'},
+  {id:'course-wakamiya',category:'golfCourse',label:'トライアルゴルフ若宮コース',note:'',addedBy:'はじめから',createdAt:'2026-01-01T00:00:00.000Z'}
+];
+const $=id=>document.getElementById(id);
+function gasUrl(){
+  if(GAS_URL)return GAS_URL;
+  const m=location.search.match(/[?&]gas=([^&]+)/);
+  if(m){try{return decodeURIComponent(m[1])}catch(e){return ''}}
+  return '';
+}
+const DEMO_KEY='dousoukai.demo.v1';
+const NAME_KEY='dousoukai.name';
+const CHOICE_KEY='dousoukai.choices.v1';
+let screen='name',tab='venue',data={options:[],votes:[]},req=0,steps=[],step=0,choices={marks:{},plan:''},name='',openList='',addCategory='',advanceTimer=0;
+function say(t){const n=$('status');if(n)n.textContent=t||''}
+function loadName(){try{return localStorage.getItem(NAME_KEY)||''}catch(e){return ''}}
+function saveName(v){try{localStorage.setItem(NAME_KEY,v)}catch(e){}}
+function loadChoices(){
+  try{const all=JSON.parse(localStorage.getItem(CHOICE_KEY)||'{}');return all[name]||null}catch(e){return null}
+}
+function saveChoices(){
+  try{
+    const all=JSON.parse(localStorage.getItem(CHOICE_KEY)||'{}');
+    all[name]={marks:choices.marks,plan:choices.plan};
+    localStorage.setItem(CHOICE_KEY,JSON.stringify(all));
+  }catch(e){}
+}
+function demoLoad(){
+  try{const raw=localStorage.getItem(DEMO_KEY);if(raw){const p=JSON.parse(raw);if(p&&p.options)return p}}catch(e){}
+  const fresh={options:SEED.map(o=>Object.assign({},o)),votes:[]};
+  demoSave(fresh);return fresh;
+}
+function demoSave(d){try{localStorage.setItem(DEMO_KEY,JSON.stringify(d))}catch(e){}}
+function trimText(v){return String(v==null?'':v).replace(/^\s+|\s+$/g,'')}
+function checkText(v,max,emptyOk){
+  const text=trimText(v);
+  if(!text)return emptyOk?{ok:true,value:''}:{ok:false,error:'空欄は送れません'};
+  if(text.length>max)return {ok:false,error:max+'文字までにしてください'};
+  return {ok:true,value:text};
+}
+function clientDispatch(store, action, body){
+  const options=(store.options||[]).map(o=>Object.assign({},o));
+  const votes=(store.votes||[]).map(v=>Object.assign({},v));
+  const box={options:options,votes:votes};
+  if(action==='get')return {ok:true,options:options,votes:votes};
+  if(action==='vote')return clientVote(box,body||{});
+  if(action==='voteBatch')return clientBatch(box,body||{});
+  if(action==='addOption')return clientAdd(box,body||{});
+  return {ok:false,error:'不明な操作です'};
+}
+function clientVote(store,body){
+  const person=checkText(body.voterName,30,false);
+  if(!person.ok)return {ok:false,error:'名前は30文字までです'};
+  const category=trimText(body.category);
+  if(['venue','date','golfPlan','golfCourse'].indexOf(category)<0)return {ok:false,error:'種類が正しくありません'};
+  const optionId=trimText(body.optionId);
+  if(!store.options.some(o=>o.category===category&&o.id===optionId))return {ok:false,error:'その候補は見当たりません'};
+  const value=trimText(body.value);
+  const now=new Date().toISOString();
+  if(category==='golfPlan'){
+    if(value!=='maru')return {ok:false,error:'ゴルフの予定は、どれか一つを選んでください'};
+    const kept=store.votes.filter(v=>!(v.category==='golfPlan'&&v.voterName===person.value));
+    kept.push({category:'golfPlan',optionId:optionId,voterName:person.value,value:'maru',updatedAt:now});
+    store.votes=kept;
+    return {ok:true,options:store.options,votes:store.votes};
+  }
+  if(value!=='maru'&&value!=='sankaku'&&value!=='batsu')return {ok:false,error:'○△×のどれかを選んでください'};
+  const next=[];let replaced=false;
+  store.votes.forEach(vote=>{
+    const same=vote.category===category&&vote.optionId===optionId&&vote.voterName===person.value;
+    if(!same){next.push(vote);return}
+    replaced=true;
+    if(vote.value===value)return;
+    next.push({category:category,optionId:optionId,voterName:person.value,value:value,updatedAt:now});
+  });
+  if(!replaced)next.push({category:category,optionId:optionId,voterName:person.value,value:value,updatedAt:now});
+  store.votes=next;
+  return {ok:true,options:store.options,votes:store.votes};
+}
+function clientBatch(store,body){
+  const person=checkText(body.voterName,30,false);
+  if(!person.ok)return {ok:false,error:'名前は30文字までです'};
+  const items=body.votes;
+  if(!items||typeof items.length!=='number')return {ok:false,error:'送信の形が正しくありません'};
+  if(items.length>80)return {ok:false,error:'回答が多すぎます'};
+  const clean=[];const seen={};let golf=false;const now=new Date().toISOString();
+  for(let i=0;i<items.length;i++){
+    const item=items[i]||{};
+    const category=trimText(item.category);
+    if(['venue','date','golfPlan','golfCourse'].indexOf(category)<0)return {ok:false,error:'種類が正しくありません'};
+    const optionId=trimText(item.optionId);
+    if(!store.options.some(o=>o.category===category&&o.id===optionId))return {ok:false,error:'その候補は見当たりません'};
+    const value=trimText(item.value);
+    if(category==='golfPlan'){
+      if(value!=='maru'||golf)return {ok:false,error:'ゴルフの予定は、どれか一つを選んでください'};
+      golf=true;
+    }else if(value!=='maru'&&value!=='sankaku'&&value!=='batsu')return {ok:false,error:'○△×のどれかを選んでください'};
+    const key=category+'\n'+optionId;
+    if(seen[key])return {ok:false,error:'同じ候補が重なっています'};
+    seen[key]=true;
+    clean.push({category:category,optionId:optionId,voterName:person.value,value:value,updatedAt:now});
+  }
+  store.votes=store.votes.filter(v=>v.voterName!==person.value).concat(clean);
+  return {ok:true,options:store.options,votes:store.votes};
+}
+function clientAdd(store,body){
+  const category=trimText(body.category);
+  if(['venue','date','golfCourse'].indexOf(category)<0)return {ok:false,error:'この欄には候補を追加できません'};
+  const label=checkText(body.label,60,false);
+  if(!label.ok)return {ok:false,error:'候補の名前は60文字までです'};
+  const note=checkText(body.note,100,true);
+  if(!note.ok)return {ok:false,error:'メモは100文字までです'};
+  const who=checkText(body.addedBy,30,false);
+  if(!who.ok)return {ok:false,error:'名前は30文字までです'};
+  if(store.options.filter(o=>o.category===category).length>=40)return {ok:false,error:'候補はこれ以上追加できません'};
+  store.options.push({id:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),category:category,label:label.value,note:note.value,addedBy:who.value,createdAt:new Date().toISOString()});
+  return {ok:true,options:store.options,votes:store.votes};
+}
+function showError(msg){$('errorText').textContent=msg;$('errorBox').hidden=false}
+function hideError(){$('errorBox').hidden=true}
+function setLoading(on){$('loading').hidden=!on}
+function showOnly(id){
+  ['nameScreen','askScreen','doneScreen','failScreen','resultScreen'].forEach(key=>$(key).hidden=key!==id);
+  document.body.classList.toggle('asking', id==='askScreen');
+  if(id==='nameScreen')document.body.dataset.section='name';
+  if(id==='doneScreen')document.body.dataset.section='done';
+  if(id==='failScreen')document.body.dataset.section='name';
+}
+async function refresh(manual){
+  const base=gasUrl();
+  if(!base){data=demoLoad();hideError();if(screen==='results')renderResults();if(manual)say('更新しました');return}
+  const n=++req;setLoading(true);hideError();
+  try{
+    const res=await fetch(base+(base.indexOf('?')>=0?'&':'?')+'action=get',{method:'GET',cache:'no-store'});
+    const json=await res.json();
+    if(n!==req)return;
+    if(!json||json.ok===false)throw new Error((json&&json.error)||'');
+    data={options:json.options||[],votes:json.votes||[]};
+    setLoading(false);
+    if(screen==='ask')buildSteps();
+    if(screen==='results')renderResults();
+    if(manual)say('更新しました');
+  }catch(e){
+    if(n!==req)return;
+    setLoading(false);
+    showError('読み込めませんでした。電波のよいところで、もう一度押してください。');
+  }
+}
+async function sendBatch(){
+  if(sendBatch.busy)return;
+  sendBatch.busy=true;
+  const votes=[];
+  Object.keys(choices.marks).forEach(key=>{
+    const parts=key.split('|');
+    if(data.options.some(o=>o.category===parts[0]&&o.id===parts[1]))votes.push({category:parts[0],optionId:parts[1],value:choices.marks[key]});
+  });
+  if(choices.plan&&data.options.some(o=>o.category==='golfPlan'&&o.id===choices.plan))votes.push({category:'golfPlan',optionId:choices.plan,value:'maru'});
+  const body={action:'voteBatch',voterName:name,votes:votes};
+  const base=gasUrl();
+  const sending=$('sendVotes');
+  if(sending)sending.textContent='送っています…';
+  try{
+    if(!base){
+      const out=clientDispatch(demoLoad(),'voteBatch',body);
+      if(!out.ok){fail(out.error||'送れませんでした');return}
+      demoSave({options:out.options,votes:out.votes});
+      data=demoLoad();
+      succeed();
+      return;
+    }
+    const res=await fetch(base,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
+    const json=await res.json();
+    if(!json||json.ok===false){fail((json&&json.error)||'送れませんでした');return}
+    data={options:json.options||[],votes:json.votes||[]};
+    succeed();
+  }catch(e){fail('電波のよいところで、もう一度送ってください。')}
+  finally{sendBatch.busy=false}
+}
+function fail(msg){$('failText').textContent=msg;screen='fail';showOnly('failScreen');say('')}
+function succeed(){screen='done';showOnly('doneScreen');say('')}
+function preselect(){
+  const saved=loadChoices();
+  if(saved&&saved.marks){choices={marks:Object.assign({},saved.marks),plan:saved.plan||''};return}
+  choices={marks:{},plan:''};
+  data.votes.forEach(v=>{
+    if(v.voterName!==name)return;
+    if(v.category==='golfPlan'&&v.value==='maru')choices.plan=v.optionId;
+    else if(v.category!=='golfPlan')choices.marks[v.category+'|'+v.optionId]=v.value;
+  });
+}
+function buildSteps(){
+  const list=[{kind:'name'}];
+  data.options.filter(o=>o.category==='venue').forEach(o=>list.push({kind:'mark',cat:'venue',option:o,title:'会場'}));
+  data.options.filter(o=>o.category==='date').forEach(o=>list.push({kind:'mark',cat:'date',option:o,title:'日程'}));
+  list.push({kind:'plan',title:'ゴルフの予定'});
+  data.options.filter(o=>o.category==='golfCourse').forEach(o=>list.push({kind:'mark',cat:'golfCourse',option:o,title:'ゴルフ場'}));
+  list.push({kind:'confirm',title:'確認'});
+  steps=list;
+  if(step>=steps.length)step=steps.length-1;
+}
+function paintNameProgress(){
+  const total=steps.length||18;
+  $('nameProgress').textContent='1 / '+total;
+  $('nameBar').style.width=Math.round(100/total)+'%';
+}
+function renderAsk(){
+  clearTimeout(advanceTimer);
+  const total=steps.length;
+  const current=steps[step];
+  document.body.dataset.section=current.kind==='mark'?current.cat:current.kind==='plan'?'golfPlan':current.kind==='confirm'?'confirm':'name';
+  $('progressText').textContent=(step+1)+' / '+total;
+  $('progressBar').style.width=Math.round((step+1)/total*100)+'%';
+  $('back').textContent='もどる';
+  $('skip').textContent='つぎへ';
+  $('skip').hidden=current.kind==='confirm';
+  $('back').parentElement.style.gridTemplateColumns=current.kind==='confirm'?'1fr':'1fr 1fr';
+  const card=$('askCard');
+  card.replaceChildren();
+  if(current.kind==='name'){
+    showOnly('nameScreen');
+    $('nameProgress').textContent=(step+1)+' / '+total;
+    $('nameInput').value=name;
+    return;
+  }
+  showOnly('askScreen');
+  if(current.kind==='mark')card.appendChild(el('p','kicker',current.title||''));
+  if(current.kind==='mark'){
+    card.appendChild(el('h2','',current.option.label));
+    if(current.option.note)card.appendChild(el('p','note',current.option.note));
+    if(current.cat==='venue'||current.cat==='golfCourse')card.appendChild(el('p','note',PRICE));
+    const selected=choices.marks[current.cat+'|'+current.option.id]||'';
+    [['maru','○','よい'],['sankaku','△','たぶん'],['batsu','×','むり']].forEach(pair=>{
+      const b=el('button','choice '+pair[0]+(selected===pair[0]?' on':''));
+      b.type='button';b.dataset.act='pick';b.dataset.value=pair[0];b.setAttribute('aria-pressed',selected===pair[0]?'true':'false');b.setAttribute('aria-label',pair[1]+' '+pair[2]);
+      b.appendChild(el('span','sym',pair[1]));
+      b.appendChild(el('span','word',pair[2]));
+      card.appendChild(b);
+    });
+  }else if(current.kind==='plan'){
+    card.appendChild(el('h2','','ゴルフの予定'));
+    card.appendChild(el('p','note','一人につき、どれか一つです。'));
+    data.options.filter(o=>o.category==='golfPlan').forEach(o=>{
+      const b=el('button','choice plan'+(choices.plan===o.id?' on':''),o.label);
+      b.type='button';b.dataset.act='plan';b.dataset.id=o.id;b.setAttribute('aria-pressed',choices.plan===o.id?'true':'false');
+      card.appendChild(b);
+    });
+  }else{
+    card.appendChild(el('h2','','この内容で送ります'));
+    const lines=summaryLines();
+    const box=el('div','summary');
+    if(!lines.length)box.appendChild(el('p','','まだ選んでいません。空のまま送ることもできます。'));
+    lines.forEach(line=>box.appendChild(el('p','',line)));
+    card.appendChild(box);
+    const send=el('button','primary','投票する');
+    send.type='button';send.id='sendVotes';send.dataset.act='send';
+    card.appendChild(send);
+  }
+}
+function summaryLines(){
+  const lines=[];
+  const markText={maru:'○',sankaku:'△',batsu:'×'};
+  data.options.forEach(o=>{
+    if(o.category==='golfPlan')return;
+    const value=choices.marks[o.category+'|'+o.id];
+    if(!value)return;
+    const head=o.category==='venue'?'会場':o.category==='date'?'日程':'ゴルフ場';
+    lines.push(head+'：'+o.label+' '+markText[value]);
+  });
+  if(choices.plan){
+    const plan=data.options.filter(o=>o.id===choices.plan)[0];
+    if(plan)lines.push('ゴルフ：'+plan.label);
+  }
+  return lines;
+}
+function chooseMark(value){
+  const current=steps[step];
+  if(!current||current.kind!=='mark')return;
+  choices.marks[current.cat+'|'+current.option.id]=value;
+  saveChoices();
+  renderAsk();
+  const here=step;
+  advanceTimer=setTimeout(()=>{if(step===here)go(1)},450);
+}
+function choosePlan(id){
+  choices.plan=id;saveChoices();renderAsk();
+  const here=step;
+  advanceTimer=setTimeout(()=>{if(step===here)go(1)},450);
+}
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n}
+function votesFor(cat,id){
+  const t={maru:[],sankaku:[],batsu:[]};
+  data.votes.forEach(v=>{if(v.category===cat&&v.optionId===id&&t[v.value])t[v.value].push(v.voterName)});
+  return t;
+}
+function topId(cat){
+  let best='',score=-1;
+  data.options.forEach(o=>{
+    if(o.category!==cat)return;
+    const n=votesFor(cat,o.id).maru.length;
+    if(n>score){score=n;best=o.id}
+  });
+  return score>0?best:'';
+}
+function optionCard(o,cat){
+  const box=el('article','option'+(topId(cat)===o.id?' top':''));
+  if(topId(cat)===o.id)box.appendChild(el('div','badge','いちばん多い'));
+  box.appendChild(el('h3','',o.label));
+  if(o.note)box.appendChild(el('p','note',o.note));
+  const t=votesFor(cat,o.id);
+  box.appendChild(el('p','counts','○'+t.maru.length+'　△'+t.sankaku.length+'　×'+t.batsu.length));
+  const key=cat+':'+o.id;
+  if(openList===key){
+    const people=el('div','people');
+    let any=false;
+    [['○',t.maru],['△',t.sankaku],['×',t.batsu]].forEach(line=>{
+      if(!line[1].length)return;any=true;people.appendChild(el('p','',line[0]+' '+line[1].join('、')));
+    });
+    if(!any)people.appendChild(el('p','','まだありません'));
+    box.appendChild(people);
+  }
+  const toggle=el('button','whoBtn',openList===key?'とじる':'投票した人を見る');
+  toggle.type='button';toggle.dataset.act='people';toggle.dataset.key=key;
+  box.appendChild(toggle);
+  return box;
+}
+function renderResults(){
+  document.body.dataset.section=tab==='golf'?'golfPlan':tab;
+  $('whoName').textContent=name;
+  ['tabVenue','tabDate','tabGolf'].forEach(id=>$(id).classList.toggle('on',(id==='tabVenue'&&tab==='venue')||(id==='tabDate'&&tab==='date')||(id==='tabGolf'&&tab==='golf')));
+  const panel=$('panel');
+  panel.replaceChildren();
+  $('demoBanner').hidden=!!gasUrl();
+  if(tab==='venue'){
+    panel.appendChild(el('h2','','① 会場'));
+    panel.appendChild(el('p','note',PRICE));
+    data.options.filter(o=>o.category==='venue').forEach(o=>panel.appendChild(optionCard(o,'venue')));
+    panel.appendChild(addLink('venue','＋会場の候補を追加'));
+  }else if(tab==='date'){
+    panel.appendChild(el('h2','','② 日程'));
+    data.options.filter(o=>o.category==='date').forEach(o=>panel.appendChild(optionCard(o,'date')));
+    panel.appendChild(addLink('date','＋日を追加'));
+  }else{
+    panel.appendChild(el('h2','','③ ゴルフの予定'));
+    data.options.filter(o=>o.category==='golfPlan').forEach(o=>{
+      const names=votesFor('golfPlan',o.id).maru;
+      const box=el('article','option'+(topId('golfPlan')===o.id?' top':''));
+      if(topId('golfPlan')===o.id)box.appendChild(el('div','badge','いちばん多い'));
+      box.appendChild(el('h3','',o.label));
+      box.appendChild(el('p','counts',names.length+'人'));
+      if(names.length)box.appendChild(el('p','note',names.join('、')));
+      panel.appendChild(box);
+    });
+    panel.appendChild(el('h2','','ゴルフ場'));
+    panel.appendChild(el('p','note',PRICE));
+    data.options.filter(o=>o.category==='golfCourse').forEach(o=>panel.appendChild(optionCard(o,'golfCourse')));
+    panel.appendChild(addLink('golfCourse','＋ゴルフ場を追加'));
+  }
+}
+function addLink(cat,label){
+  const b=el('button','linkish',label);
+  b.type='button';b.dataset.act='add';b.dataset.cat=cat;
+  return b;
+}
+function openResults(){
+  clearTimeout(advanceTimer);
+  screen='results';
+  showOnly('resultScreen');
+  renderResults();
+}
+function enterName(){
+  const v=$('nameInput').value.replace(/^\s+|\s+$/g,'').slice(0,30);
+  if(!v){$('nameMsg').textContent='名前を入れてください';return}
+  if(name&&name!==v)saveChoices();
+  const changed=name!==v;
+  name=v;saveName(name);
+  $('nameMsg').textContent='';
+  if(changed)choices={marks:{},plan:''};
+  preselect();
+  stepStart(1);
+}
+function stepStart(at){
+  if(!data.options.length)data=demoLoad();
+  buildSteps();
+  step=Math.max(1,Math.min(at,steps.length-1));
+  screen='ask';
+  renderAsk();
+}
+function beginFresh(){
+  name=loadName();
+  $('nameInput').value=name;
+  $('demoBanner').hidden=!!gasUrl();
+  const boot=gasUrl()?refresh(false):Promise.resolve().then(()=>{data=demoLoad()});
+  Promise.resolve(boot).then(()=>{
+    buildSteps();
+    paintNameProgress();
+    if(!data.options.length){showOnly('nameScreen');return}
+    if(name){preselect();stepStart(1)}
+    else showOnly('nameScreen');
+  });
+}
+function openAdd(cat){
+  addCategory=cat;
+  $('addLabel').value='';$('addNote').value='';
+  $('addTitle').textContent=cat==='date'?'日を追加':cat==='golfCourse'?'ゴルフ場を追加':'会場を追加';
+  $('addDialog').hidden=false;
+}
+function saveAdd(){
+  const label=$('addLabel').value,note=$('addNote').value;
+  $('addDialog').hidden=true;
+  const body={action:'addOption',category:addCategory,label:label,note:note,addedBy:name||'ななし'};
+  const base=gasUrl();
+  if(!base){
+    const out=clientDispatch(demoLoad(),'addOption',body);
+    if(!out.ok){say(out.error||'追加できませんでした');return}
+    demoSave({options:out.options,votes:out.votes});
+    data=demoLoad();buildSteps();renderResults();say('追加しました');return;
+  }
+  postOnly(body).then(ok=>{if(ok){buildSteps();renderResults();say('追加しました')}});
+}
+async function postOnly(body){
+  try{
+    const res=await fetch(gasUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});
+    const json=await res.json();
+    if(!json||json.ok===false){say((json&&json.error)||'追加できませんでした');return false}
+    data={options:json.options||[],votes:json.votes||[]};
+    return true;
+  }catch(e){say('追加できませんでした');return false}
+}
+function clickSound(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    if(!clickSound.ctx)clickSound.ctx=new AC();
+    const ctx=clickSound.ctx;
+    if(ctx.state==='suspended'){const p=ctx.resume();if(p&&p.catch)p.catch(function(){})}
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.value=640;g.gain.value=0.03;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.04);
+  }catch(e){}
+}
+let lastAct='',lastAt=0,downX=0,downY=0,haveDown=false,ptrAt=0;
+function actKey(el){return (el.id||'')+':'+(el.dataset.act||'')+':'+(el.dataset.value||el.dataset.id||'')}
+function runAct(el){
+  const act=el.dataset?el.dataset.act:'';
+  if(el.id==='nameNext'){enterName();return}
+  if(el.id==='back'){go(-1);return}
+  if(el.id==='skip'){go(1);return}
+  if(el.id==='toResults'||el.id==='seeResults'){openResults();return}
+  if(el.id==='redo'||el.id==='backToVote'){stepStart(1);return}
+  if(el.id==='sendVotes'||act==='send'||el.id==='resend'){sendBatch();return}
+  if(el.id==='failBack'){screen='ask';renderAsk();return}
+  if(el.id==='retry'||el.id==='refresh'){refresh(true);return}
+  if(el.id==='tabVenue'){tab='venue';renderResults();return}
+  if(el.id==='tabDate'){tab='date';renderResults();return}
+  if(el.id==='tabGolf'){tab='golf';renderResults();return}
+  if(act==='pick'){chooseMark(el.dataset.value);return}
+  if(act==='plan'){choosePlan(el.dataset.id);return}
+  if(act==='people'){openList=openList===el.dataset.key?'':el.dataset.key;renderResults();return}
+  if(act==='add'){openAdd(el.dataset.cat);return}
+  if(el.id==='addCancel'){$('addDialog').hidden=true;return}
+  if(el.id==='addSave'){saveAdd();return}
+}
+function go(delta){
+  clearTimeout(advanceTimer);
+  if(screen==='name'){if(delta>0)enterName();return}
+  const next=step+delta;
+  if(next<1){screen='name';showOnly('nameScreen');$('nameInput').value=name;buildSteps();paintNameProgress();return}
+  if(next>=steps.length)return;
+  step=next;renderAsk();
+}
+function fromPoint(x,y){
+  const stack=document.elementsFromPoint?document.elementsFromPoint(x,y):[document.elementFromPoint(x,y)];
+  for(let i=0;i<stack.length;i++){
+    const n=stack[i]&&stack[i].closest?stack[i].closest('button,a.share'):null;
+    if(n)return n;
+  }
+  return null;
+}
+function handleUp(e){
+  const src=(e.changedTouches&&e.changedTouches[0])||e;
+  if(haveDown&&Math.hypot(src.clientX-downX,src.clientY-downY)>28){haveDown=false;return}
+  haveDown=false;
+  const btn=fromPoint(src.clientX,src.clientY);
+  if(!btn||btn.tagName==='A')return;
+  const now=Date.now(),key=actKey(btn);
+  if(key===lastAct&&now-lastAt<400)return;
+  lastAct=key;lastAt=now;
+  runAct(btn);clickSound();
+}
+document.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;haveDown=true},{passive:true});
+document.addEventListener('pointerup',e=>{ptrAt=Date.now();handleUp(e)});
+document.addEventListener('click',e=>{
+  const btn=e.target&&e.target.closest?e.target.closest('button'):null;
+  if(!btn)return;
+  const now=Date.now(),key=actKey(btn);
+  if(key===lastAct&&now-lastAt<400)return;
+  lastAct=key;lastAt=now;
+  runAct(btn);clickSound();
+});
+document.addEventListener('touchstart',e=>{
+  if(window.PointerEvent)return;
+  const t=e.touches&&e.touches[0];if(!t)return;
+  downX=t.clientX;downY=t.clientY;haveDown=true;
+},{passive:true});
+document.addEventListener('touchend',e=>{if(window.PointerEvent&&Date.now()-ptrAt<400)return;handleUp(e)},{passive:true});
+$('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();enterName()}});
+$('lineShare').href=LINE;
+$('demoBanner').hidden=!!gasUrl();
+name=loadName();
+if(name)$('nameInput').value=name;
+beginFresh();
+setInterval(()=>{if(gasUrl()&&screen==='results'&&$('addDialog').hidden)refresh(false)},30000);
+window.__dousoukaiSeed=SEED;
+window.__dousoukaiDispatch=clientDispatch;
+})();
+</script>
+</body>
+</html>
