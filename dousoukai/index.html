@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#8c2f39">
+<meta name="theme-color" content="#0A6FCB">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="同窓会アンケート">
 <title>同窓会アンケート</title>
@@ -19,67 +19,120 @@
 <meta name="twitter:title" content="同窓会アンケート">
 <meta name="twitter:description" content="福岡・2027年10月〜11月の同窓会。会場・日程・ゴルフを、○△×で答えます。">
 <meta name="twitter:image" content="https://yukiocow0831-create.github.io/snowdef-t5n8qv3x/dousoukai/ogp.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238c2f39'/%3E%3Ccircle cx='22' cy='28' r='8' fill='%23ffe08a'/%3E%3Ccircle cx='42' cy='28' r='8' fill='%23fff'/%3E%3Cpath d='M14 46c6-8 30-8 36 0' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A6FCB'/%3E%3Ccircle cx='18' cy='24' r='8' fill='%23FFE14A'/%3E%3Ccircle cx='36' cy='20' r='7' fill='%23FF4D8D'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%233DCE6E'/%3E%3Cpath d='M14 46c6-8 30-8 36 0' fill='none' stroke='%23fff' stroke-width='4'/%3E%3C/svg%3E">
 <style>
-:root{font-family:"Hiragino Sans","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#241c18;font-size:22px;line-height:1.45;background:#f7f1e8}
+:root{font-family:"Hiragino Sans","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;color:#10233A;font-size:22px;line-height:1.45;background:#fff3c4}
 *{box-sizing:border-box}
 [hidden]{display:none!important;pointer-events:none!important}
-html,body{margin:0;background:#f7f1e8;overscroll-behavior:none}
-body{padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}
+html,body{margin:0;background:#c8ecff;overscroll-behavior:none}
+body{min-height:100vh;padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(180deg,#c8ecff 0%,#ffe3f2 42%,#fff3c4 100%)}
 button,input,textarea{font:inherit;color:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button{border:0;cursor:pointer;min-height:64px;border-radius:18px;font-weight:800}
-input,textarea{width:100%;border:3px solid #c9b2a2;border-radius:18px;padding:16px;background:#fff;font-size:22px}
+input,textarea{width:100%;border:3px solid #0A6FCB;border-radius:18px;padding:16px;background:#fff;font-size:22px}
 textarea{min-height:96px}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:4px solid #b8860b;outline-offset:3px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:4px solid #0A6FCB;outline-offset:3px}
 #app{max-width:640px;margin:0 auto}
-header{background:linear-gradient(120deg,#8c2f39,#c56a2c);color:#fff;border-radius:22px;padding:12px 16px}
-header p{margin:2px 0 0;font-size:20px;color:#ffe7c4}
+header{background:linear-gradient(120deg,#0A6FCB 0%,#C81E6A 52%,#C2410C 100%);color:#fff;border-radius:22px;padding:12px 16px;box-shadow:0 6px 0 #ffb3d9}
+header p{margin:2px 0 0;font-size:20px;color:#fff}
 h1{font-size:32px;line-height:1.2;margin:0}
-h2{font-size:28px;line-height:1.25;margin:0 0 4px;color:#6e2430}
-.banner{margin:6px 0;background:#fff3c4;border:3px solid #8a6200;border-radius:16px;padding:6px 10px;font-weight:800;text-align:center;color:#3d2a04}
+h2{font-size:28px;line-height:1.25;margin:0 0 4px;color:#0B4FBF}
+.banner{margin:6px 0;background:#FFE14A;border:3px solid #C2410C;border-radius:16px;padding:6px 10px;font-weight:800;text-align:center;color:#3A2500}
 body.asking header{padding:8px 14px}
 body.asking header p{display:none}
 body.asking h1{font-size:28px}
-.card{background:#fff;border-radius:22px;padding:14px;margin:8px 0;box-shadow:0 4px 0 #e4d5c8}
-.note{font-size:20px;color:#4a3b34;margin:4px 0}
-.primary{width:100%;background:#8c2f39;color:#fff;font-size:24px;min-height:72px;box-shadow:0 5px 0 #641f28}
-.ghost{background:#fff;color:#6e2430;box-shadow:inset 0 0 0 3px #c9b2a2;font-size:22px}
+.card{background:#fff;border:3px solid #7ec8ff;border-radius:22px;padding:14px;margin:8px 0;box-shadow:0 6px 0 #b7e4ff}
+.note{font-size:20px;color:#243044;margin:4px 0}
+.primary{width:100%;background:#0A6FCB;color:#fff;font-size:24px;min-height:72px;box-shadow:0 5px 0 #C81E6A}
+.ghost{background:#fff;color:#0A6FCB;box-shadow:inset 0 0 0 3px #0A6FCB;font-size:22px}
 .progress{margin:8px 0 4px}
-.progress b,#nameProgress{font-size:28px;font-weight:800}
-.bar{height:16px;background:#eadfd4;border-radius:999px;overflow:hidden;margin-top:6px}
-.bar span{display:block;height:100%;background:#2f7d4a;width:0}
+.progress b,#nameProgress{font-size:28px;font-weight:800;color:#0B4FBF}
+.bar{height:16px;background:#fff;border-radius:999px;overflow:hidden;margin-top:6px;box-shadow:inset 0 0 0 2px #7ec8ff}
+.bar span{display:block;height:100%;background:linear-gradient(90deg,#0A6FCB,#C81E6A,#E85D04);width:0}
 .nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .nav button{min-height:72px;font-size:24px}
 body.asking #askScreen{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
-body.asking .nav{position:fixed;left:12px;right:12px;bottom:max(8px,env(safe-area-inset-bottom));margin:0;z-index:4;background:#f7f1e8;padding-top:8px}
-.choice{width:100%;min-height:80px;font-size:26px;margin:4px 0;border-radius:18px;background:#fff;color:#241c18;box-shadow:inset 0 0 0 3px #c9b2a2}
-.choice.maru.on{background:#1c7c43;color:#fff;box-shadow:0 0 0 4px #145c32}
-.choice.sankaku.on{background:#8a5600;color:#fff;box-shadow:0 0 0 4px #5c3900}
-.choice.batsu.on{background:#9d2f3a;color:#fff;box-shadow:0 0 0 4px #6e1c24}
-.choice.plan.on{background:#1c7c43;color:#fff;box-shadow:0 0 0 4px #145c32}
-.kicker{font-size:20px;font-weight:800;color:#8c2f39;margin:0 0 6px}
+body.asking .nav{position:fixed;left:12px;right:12px;bottom:max(8px,env(safe-area-inset-bottom));margin:0;z-index:4;background:#fff3c4;padding-top:8px}
+.choice{width:100%;min-height:80px;font-size:26px;margin:4px 0;border-radius:18px;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px}
+.choice .sym{color:#fff;line-height:1}
+.choice.maru{background:#0E893E;box-shadow:0 4px 0 #087232}
+.choice.sankaku{background:#FFE14A;color:#3A2500;box-shadow:0 4px 0 #E0A100}
+.choice.sankaku .sym{background:#B45309;width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.choice.batsu{background:#E02D52;box-shadow:0 4px 0 #A31838}
+.choice.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 4px #10233A}
+.choice.plan{background:#C2410C;box-shadow:0 4px 0 #9A3412}
+.choice.plan[data-id="golfplan-zenjitsu"]{background:#0A6FCB;box-shadow:0 4px 0 #084E96}
+.choice.plan[data-id="golfplan-toujitsu"]{background:#C2410C;box-shadow:0 4px 0 #9A3412}
+.choice.plan[data-id="golfplan-nashi"]{background:#C81E6A;box-shadow:0 4px 0 #8E1450}
+.choice.on,.choice.plan.on{box-shadow:inset 0 0 0 4px #fff,0 0 0 4px #10233A}
+.kicker{font-size:20px;font-weight:800;color:#0B4FBF;margin:0 0 6px}
 .summary p{margin:8px 0;font-size:22px}
-.done{position:fixed;inset:0;z-index:5;margin:0;border:0;border-radius:0;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#e7f6ec;padding:max(28px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom))}
-.check{width:120px;height:120px;border-radius:50%;background:#1c7c43;color:#fff;font-size:72px;line-height:120px;font-weight:800}
-.done h2{font-size:34px;color:#145c32;margin:16px 0}
+.done{position:fixed;inset:0;z-index:5;margin:0;border:0;border-radius:0;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:linear-gradient(160deg,#bfe9ff 0%,#ffd0ea 46%,#fff3b0 100%);padding:max(28px,env(safe-area-inset-top)) 18px max(28px,env(safe-area-inset-bottom));overflow:hidden}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;display:block;width:18px;height:18px;border-radius:4px}
+.confetti i:nth-child(1){left:6%;top:8%;background:#0A6FCB;transform:rotate(18deg)}
+.confetti i:nth-child(2){left:18%;top:18%;background:#FFE14A;border-radius:50%}
+.confetti i:nth-child(3){left:78%;top:7%;background:#E02D52;transform:rotate(30deg)}
+.confetti i:nth-child(4){left:88%;top:22%;background:#0E893E;border-radius:50%}
+.confetti i:nth-child(5){left:8%;top:72%;background:#C81E6A;transform:rotate(-20deg)}
+.confetti i:nth-child(6){left:22%;top:84%;background:#0A6FCB;border-radius:50%}
+.confetti i:nth-child(7){left:80%;top:70%;background:#FFE14A;transform:rotate(12deg)}
+.confetti i:nth-child(8){left:70%;top:86%;background:#E85D04;border-radius:50%}
+.confetti i:nth-child(9){left:46%;top:6%;background:#3DCE6E;transform:rotate(40deg)}
+.confetti i:nth-child(10){left:60%;top:16%;background:#FF4D8D;border-radius:50%}
+.confetti i:nth-child(11){left:4%;top:42%;background:#FF8A1A;border-radius:50%}
+.confetti i:nth-child(12){left:90%;top:48%;background:#7C5CFF;transform:rotate(25deg)}
+.done>*:not(.confetti){position:relative;z-index:1}
+.check{position:relative;width:140px;height:140px;border-radius:50%;background:conic-gradient(#0A6FCB,#3DCE6E,#FFE14A,#FF8A1A,#FF4D8D,#0A6FCB);box-shadow:0 10px 0 #ff9ec8;display:flex;align-items:center;justify-content:center}
+.check span{width:108px;height:108px;border-radius:50%;background:#fff;color:#0A6B2C;font-size:72px;line-height:108px;font-weight:800}
+.done h2{font-size:34px;color:#10233A;margin:16px 0}
+.done p{color:#10233A}
 .done .primary,.done .ghost{width:min(440px,92%);margin-top:12px}
 .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.tabs button{background:#fff;color:#6e2430;box-shadow:inset 0 0 0 3px #c9b2a2;font-size:20px;padding:8px 4px}
-.tabs button.on{background:#8c2f39;color:#fff}
-.option{border:3px solid #eadfd4;border-radius:20px;padding:14px;margin:12px 0;background:#fff}
-.option.top{border-color:#8a6200;background:#fff8e4}
-.badge{display:inline-block;background:#8a6200;color:#fff;border-radius:999px;padding:4px 12px;font-size:20px;font-weight:800}
-.option h3{margin:6px 0;font-size:24px}
+.tabs button{background:#fff;font-size:20px;padding:8px 4px}
+#tabVenue{color:#0B4FBF;box-shadow:inset 0 0 0 3px #0A6FCB}
+#tabDate{color:#0A6B2C;box-shadow:inset 0 0 0 3px #0E893E}
+#tabGolf{color:#C2410C;box-shadow:inset 0 0 0 3px #E85D04}
+#tabVenue.on{background:#0A6FCB;color:#fff;box-shadow:none}
+#tabDate.on{background:#0A6B2C;color:#fff;box-shadow:none}
+#tabGolf.on{background:#C2410C;color:#fff;box-shadow:none}
+.option{border:3px solid #7ec8ff;border-radius:20px;padding:14px;margin:12px 0;background:#fff;box-shadow:0 4px 0 #d6efff}
+.option.top{border-color:#0A6FCB;background:#e7f4ff}
+.badge{display:inline-block;background:#0A6FCB;color:#fff;border-radius:999px;padding:4px 12px;font-size:20px;font-weight:800}
+.option h3{margin:6px 0;font-size:24px;color:#10233A}
 .counts{font-size:22px;font-weight:800}
-.whoBtn,.linkish{width:100%;margin-top:8px;background:#fff;color:#6e2430;min-height:56px;font-size:20px;box-shadow:inset 0 0 0 3px #c9b2a2}
+.whoBtn,.linkish{width:100%;margin-top:8px;background:#fff;color:#0A6FCB;min-height:56px;font-size:20px;box-shadow:inset 0 0 0 3px #0A6FCB}
 .people p{margin:6px 0;font-size:22px}
 .row{display:flex;gap:8px}
 .row>*{flex:1}
 #status{min-height:1.4em;font-size:22px;font-weight:800;text-align:center}
-.veil{position:fixed;inset:0;background:#241c1888;display:flex;align-items:flex-end;justify-content:center;padding:12px;z-index:6}
+.veil{position:fixed;inset:0;background:#10233a88;display:flex;align-items:flex-end;justify-content:center;padding:12px;z-index:6}
 .veil .card{width:min(560px,100%)}
-.error{background:#fff1f0;border:3px solid #9d2f3a}
-a.share{display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:18px;background:#06c755;color:#fff;font-weight:800;text-decoration:none;font-size:22px;margin-top:10px}
+.error{background:#fff0f3;border:3px solid #E02D52}
+.error h2,.error p{color:#9F1239}
+a.share{display:flex;align-items:center;justify-content:center;min-height:64px;border-radius:18px;background:#048A3C;color:#fff;font-weight:800;text-decoration:none;font-size:22px;margin-top:10px}
+body[data-section="name"] #nameScreen{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#0A6FCB,#E4377A,#FF8A1A) border-box;box-shadow:0 6px 0 #ffb3d9}
+body[data-section="name"] h2{color:#C81E6A}
+body[data-section="venue"] #askCard,body[data-section="venue"] .option,body[data-section="venue"] .who{border-color:#1A8CFF;box-shadow:0 6px 0 #8ec5ff}
+body[data-section="venue"] .option.top{border-color:#0A6FCB;background:#e7f4ff}
+body[data-section="venue"] h2,body[data-section="venue"] .kicker,body[data-section="venue"] .progress b{color:#0B4FBF}
+body[data-section="venue"] .bar{box-shadow:inset 0 0 0 2px #8ec5ff}
+body[data-section="venue"] .bar span{background:#0A6FCB}
+body[data-section="venue"] .badge{background:#0A6FCB}
+body[data-section="date"] #askCard,body[data-section="date"] .option,body[data-section="date"] .who{border-color:#3DCE6E;box-shadow:0 6px 0 #8ee6a8}
+body[data-section="date"] .option.top{border-color:#0A6B2C;background:#e5fbea}
+body[data-section="date"] h2,body[data-section="date"] .kicker,body[data-section="date"] .progress b{color:#0A6B2C}
+body[data-section="date"] .bar{box-shadow:inset 0 0 0 2px #8ee6a8}
+body[data-section="date"] .bar span{background:#0A6B2C}
+body[data-section="date"] .badge{background:#0A6B2C}
+body[data-section="golfPlan"] #askCard,body[data-section="golfPlan"] .option,body[data-section="golfPlan"] .who,body[data-section="golfCourse"] #askCard,body[data-section="golfCourse"] .option{border-color:#FF8A1A;box-shadow:0 6px 0 #ffc48a}
+body[data-section="golfPlan"] .option.top,body[data-section="golfCourse"] .option.top{border-color:#C2410C;background:#fff1e6}
+body[data-section="golfPlan"] h2,body[data-section="golfPlan"] .kicker,body[data-section="golfPlan"] .progress b,body[data-section="golfCourse"] h2,body[data-section="golfCourse"] .kicker,body[data-section="golfCourse"] .progress b{color:#C2410C}
+body[data-section="golfPlan"] .bar,body[data-section="golfCourse"] .bar{box-shadow:inset 0 0 0 2px #ffc48a}
+body[data-section="golfPlan"] .bar span,body[data-section="golfCourse"] .bar span{background:#C2410C}
+body[data-section="golfPlan"] .badge,body[data-section="golfCourse"] .badge{background:#C2410C}
+body[data-section="confirm"] #askCard{border-color:transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#0A6FCB,#3DCE6E,#FF8A1A) border-box;box-shadow:0 6px 0 #ffb3d9}
+body[data-section="confirm"] h2,body[data-section="confirm"] .progress b{color:#C81E6A}
+body[data-section="confirm"] .bar span{background:linear-gradient(90deg,#0A6FCB,#3DCE6E,#FF8A1A)}
 </style>
 </head>
 <body>
@@ -118,7 +171,8 @@ a.share{display:flex;align-items:center;justify-content:center;min-height:64px;b
   </section>
 
   <section id="doneScreen" class="done" hidden>
-    <div class="check" aria-hidden="true">✓</div>
+    <div class="confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="check" aria-hidden="true"><span>✓</span></div>
     <h2>投票しました！ありがとうございます</h2>
     <p>回答を受け取りました。</p>
     <button id="seeResults" class="primary" type="button">みんなの結果を見る</button>
@@ -308,6 +362,9 @@ function setLoading(on){$('loading').hidden=!on}
 function showOnly(id){
   ['nameScreen','askScreen','doneScreen','failScreen','resultScreen'].forEach(key=>$(key).hidden=key!==id);
   document.body.classList.toggle('asking', id==='askScreen');
+  if(id==='nameScreen')document.body.dataset.section='name';
+  if(id==='doneScreen')document.body.dataset.section='done';
+  if(id==='failScreen')document.body.dataset.section='name';
 }
 async function refresh(manual){
   const base=gasUrl();
@@ -390,6 +447,7 @@ function renderAsk(){
   clearTimeout(advanceTimer);
   const total=steps.length;
   const current=steps[step];
+  document.body.dataset.section=current.kind==='mark'?current.cat:current.kind==='plan'?'golfPlan':current.kind==='confirm'?'confirm':'name';
   $('progressText').textContent=(step+1)+' / '+total;
   $('progressBar').style.width=Math.round((step+1)/total*100)+'%';
   $('back').textContent='もどる';
@@ -411,9 +469,11 @@ function renderAsk(){
     if(current.option.note)card.appendChild(el('p','note',current.option.note));
     if(current.cat==='venue'||current.cat==='golfCourse')card.appendChild(el('p','note',PRICE));
     const selected=choices.marks[current.cat+'|'+current.option.id]||'';
-    [['maru','○ よい'],['sankaku','△ たぶん'],['batsu','× むり']].forEach(pair=>{
-      const b=el('button','choice '+pair[0]+(selected===pair[0]?' on':''),pair[1]);
-      b.type='button';b.dataset.act='pick';b.dataset.value=pair[0];b.setAttribute('aria-pressed',selected===pair[0]?'true':'false');
+    [['maru','○','よい'],['sankaku','△','たぶん'],['batsu','×','むり']].forEach(pair=>{
+      const b=el('button','choice '+pair[0]+(selected===pair[0]?' on':''));
+      b.type='button';b.dataset.act='pick';b.dataset.value=pair[0];b.setAttribute('aria-pressed',selected===pair[0]?'true':'false');b.setAttribute('aria-label',pair[1]+' '+pair[2]);
+      b.appendChild(el('span','sym',pair[1]));
+      b.appendChild(el('span','word',pair[2]));
       card.appendChild(b);
     });
   }else if(current.kind==='plan'){
@@ -504,6 +564,7 @@ function optionCard(o,cat){
   return box;
 }
 function renderResults(){
+  document.body.dataset.section=tab==='golf'?'golfPlan':tab;
   $('whoName').textContent=name;
   ['tabVenue','tabDate','tabGolf'].forEach(id=>$(id).classList.toggle('on',(id==='tabVenue'&&tab==='venue')||(id==='tabDate'&&tab==='date')||(id==='tabGolf'&&tab==='golf')));
   const panel=$('panel');
@@ -667,6 +728,14 @@ function handleUp(e){
 }
 document.addEventListener('pointerdown',e=>{downX=e.clientX;downY=e.clientY;haveDown=true},{passive:true});
 document.addEventListener('pointerup',e=>{ptrAt=Date.now();handleUp(e)});
+document.addEventListener('click',e=>{
+  const btn=e.target&&e.target.closest?e.target.closest('button'):null;
+  if(!btn)return;
+  const now=Date.now(),key=actKey(btn);
+  if(key===lastAct&&now-lastAt<400)return;
+  lastAct=key;lastAt=now;
+  runAct(btn);clickSound();
+});
 document.addEventListener('touchstart',e=>{
   if(window.PointerEvent)return;
   const t=e.touches&&e.touches[0];if(!t)return;
